@@ -5,6 +5,7 @@ version = "0.1.0"
 license = "MIT"
 homepage = "https://github.com/siketyan/ghr"
 repository = "https://github.com/siketyan/ghr.git"
+readme = "README.md"
 edition = "2021"
 authors = [
     "Naoki Ikeguchi <me@s6n.jp>",
