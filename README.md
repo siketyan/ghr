@@ -42,3 +42,21 @@ owner = "acme" # Applies company profiles to all repositories in `acme` org
 [[rules]]
 profile.name = "default"
 ```
+
+### Finding path of the repository
+```shell
+ghr path # Root directory
+ghr path <owner> # Owner root
+ghr path <owner> <repo> # Repository directory
+ghr path --host=github.com # Host root
+ghr path --host=github.com <owner> # Owner root of the specified host
+ghr path --host=github.com <owner> <repo> # Repository directory of the specified host
+```
+
+## 🛠 Customising
+You can change the root of repositories managed by ghr by setting environment variable `GHR_ROOT` in your shell profile.
+
+```shell
+ghr path # ~/.ghr
+GHR_ROOT=/path/to/root ghr path # /path/to/root
+```

@@ -6,8 +6,10 @@ mod root;
 mod rule;
 mod url;
 
-use clap::Parser;
+use std::io::stderr;
 use std::process::exit;
+
+use clap::Parser;
 use tracing::error;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::EnvFilter;
@@ -25,6 +27,7 @@ async fn main() {
                 .with_default_directive(LevelFilter::INFO.into())
                 .from_env_lossy(),
         )
+        .with_writer(stderr)
         .init();
 
     if let Err(e) = Cli::parse().run().await {

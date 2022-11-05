@@ -1,4 +1,5 @@
 mod clone;
+mod path;
 mod profile;
 
 use anyhow::Result;
@@ -8,6 +9,8 @@ use clap::{Parser, Subcommand};
 pub enum Action {
     /// Clones a Git repository to local.
     Clone(clone::Cmd),
+    /// Prints the path to root, owner, or a repository.
+    Path(path::Cmd),
     /// Manages profiles to use in repositories.
     Profile(profile::Cmd),
 }
@@ -23,6 +26,7 @@ impl Cli {
         use Action::*;
         match self.action {
             Clone(cmd) => cmd.run().await,
+            Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
         }
     }
