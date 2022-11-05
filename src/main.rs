@@ -1,5 +1,6 @@
 mod cmd;
 mod config;
+mod console;
 mod path;
 mod profile;
 mod root;

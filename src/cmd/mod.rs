@@ -1,4 +1,5 @@
 mod clone;
+mod delete;
 mod init;
 mod path;
 mod profile;
@@ -10,6 +11,8 @@ use clap::{Parser, Subcommand};
 pub enum Action {
     /// Clones a Git repository to local.
     Clone(clone::Cmd),
+    /// Deletes a repository from local.
+    Delete(delete::Cmd),
     /// Initialises a Git repository in local.
     Init(init::Cmd),
     /// Prints the path to root, owner, or a repository.
@@ -29,7 +32,8 @@ impl Cli {
         use Action::*;
         match self.action {
             Clone(cmd) => cmd.run().await,
-            Init(cmd) => cmd.run().await,
+            Delete(cmd) => cmd.run().await,
+            Init(cmd) => cmd.run(),
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
         }

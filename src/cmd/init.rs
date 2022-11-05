@@ -20,7 +20,7 @@ pub struct Cmd {
 }
 
 impl Cmd {
-    pub async fn run(self) -> Result<()> {
+    pub fn run(self) -> Result<()> {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
@@ -32,17 +32,15 @@ impl Cmd {
             .and_then(|r| config.profiles.resolve(&r.profile));
 
         let path = PathBuf::from(&path);
-        if path.exists() {
-            match Confirm::new()
+        if path.exists()
+            && !Confirm::new()
                 .with_prompt(format!(
                     "{} The directory already exists. Are you sure want to re-initialise?",
                     style("CHECK").dim(),
                 ))
                 .interact()?
-            {
-                false => return Ok(()),
-                _ => (),
-            }
+        {
+            return Ok(());
         }
 
         let repo = Repository::init(path)?;
