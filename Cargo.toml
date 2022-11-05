@@ -1,0 +1,28 @@
+[package]
+name = "ghr"
+description = "Yet another repository management with auto-attaching profiles."
+version = "0.1.0"
+license = "MIT"
+homepage = "https://github.com/siketyan/ghr"
+repository = "https://github.com/siketyan/ghr.git"
+edition = "2021"
+authors = [
+    "Naoki Ikeguchi <me@s6n.jp>",
+]
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+console = "0.15.2"
+dirs = "4.0"
+git2 = "0.15.0"
+itertools = "0.10.5"
+indicatif = "0.17.1"
+lazy_static = "1.4"
+regex = "1.6"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.21", features = ["macros", "rt-multi-thread"] }
+toml = "0.5.9"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+url = "2.3"
