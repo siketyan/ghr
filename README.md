@@ -4,6 +4,13 @@
 
 Yet another repository management with auto-attaching profiles.
 
+## 🔥 Motivation
+[ghq](https://github.com/x-motemen/ghq) is the most famous solution to resolve stress of our repository management currently.
+However, I wanted to customise the git configuration by some rules, such as using my company email in their repositories.
+
+To achieve that, ghq was not enough for me.
+So I have rewritten them as simple, in Rust, the robust and modern language today.
+
 ## 📦 Installation
 ```shell
 cargo install ghr
