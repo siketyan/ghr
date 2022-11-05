@@ -1,11 +1,15 @@
 mod list;
+mod show;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]
 pub enum Action {
+    /// Lists all configured profiles.
     List(list::Cmd),
+    /// Shows a profile in TOML format.
+    Show(show::Cmd),
 }
 
 #[derive(Debug, Parser)]
@@ -19,6 +23,7 @@ impl Cmd {
         use Action::*;
         match self.action {
             List(cmd) => cmd.run(),
+            Show(cmd) => cmd.run(),
         }
     }
 }

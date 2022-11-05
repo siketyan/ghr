@@ -4,9 +4,9 @@ use std::ops::Deref;
 use crate::rule::ProfileRef;
 use anyhow::Result;
 use git2::Config;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct User {
     #[serde(default)]
     pub name: Option<String>,
@@ -14,7 +14,7 @@ pub struct User {
     pub email: Option<String>,
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Profile {
     #[serde(default)]
     pub user: Option<User>,
