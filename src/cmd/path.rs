@@ -1,8 +1,11 @@
-use crate::path::PartialPath;
-use crate::root::Root;
+use std::path::PathBuf;
+
 use anyhow::{anyhow, Result};
 use clap::Parser;
-use std::path::PathBuf;
+
+use crate::path::PartialPath;
+use crate::root::Root;
+use crate::url::Host;
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
@@ -21,7 +24,7 @@ impl Cmd {
         let root = Root::find()?;
         let path = PartialPath {
             root: &root,
-            host: self.host,
+            host: self.host.or_else(|| Some(Host::GitHub.to_string())),
             owner: self.owner,
             repo: self.repo,
         };
