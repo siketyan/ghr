@@ -15,6 +15,7 @@ authors = [
 anyhow = "1.0"
 clap = { version = "4.0", features = ["derive"] }
 console = "0.15.2"
+dialoguer = "0.10.2"
 dirs = "4.0"
 git2 = "0.15.0"
 itertools = "0.10.5"
