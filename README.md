@@ -1,4 +1,7 @@
 # 🚀 ghr
+[![crates.io](https://img.shields.io/crates/v/ghr.svg)](https://crates.io/crates/ghr)
+[![Rust](https://github.com/siketyan/ghr/actions/workflows/rust.yml/badge.svg)](https://github.com/siketyan/ghr/actions/workflows/rust.yml)
+
 Yet another repository management with auto-attaching profiles.
 
 ## 📦 Installation
