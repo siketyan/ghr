@@ -17,6 +17,21 @@ cargo install ghr
 ```
 
 ## 💚 Usages
+```
+Usage: ghr <COMMAND>
+
+Commands:
+  clone    Clones a Git repository to local
+  delete   Deletes a repository from local
+  init     Initialises a Git repository in local
+  path     Prints the path to root, owner, or a repository
+  profile  Manages profiles to use in repositories
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help information
+```
+
 ### Cloning a repository
 ghr supports many patterns or URLs of the repository to clone:
 
