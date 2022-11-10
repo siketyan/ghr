@@ -65,6 +65,14 @@ If you have installed the shell extension, you can change directory into the clo
 ghr clone <url_or_pattern> --cd
 ```
 
+### Changing directory
+You can change directory into a repository on the shell.
+It requires installing the shell extension.
+
+```shell
+ghr cd <url_or_pattern>
+```
+
 ### Attaching profiles
 Create `~/.ghr/config.toml` and edit as you like:
 
