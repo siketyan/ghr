@@ -12,10 +12,14 @@ pub enum Kind {
 
 impl Display for Kind {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
-            Kind::Bash => "bash",
-            Kind::Fish => "fish",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Kind::Bash => "bash",
+                Kind::Fish => "fish",
+            },
+        )
     }
 }
 
@@ -30,7 +34,7 @@ impl Cmd {
     pub fn run(self) -> Result<()> {
         let script = match self.kind {
             Kind::Bash => include_str!("../../resources/shell/ghr.bash"),
-            Kind::Fish => include_str!("../../resources/shell/ghr.fish")
+            Kind::Fish => include_str!("../../resources/shell/ghr.fish"),
         };
 
         print!("{}", script);
