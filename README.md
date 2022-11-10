@@ -25,7 +25,7 @@ Add the line below to your shell configuration script to enable it.
 eval "$(ghr shell bash)"
 ```
 
-### Fish
+#### Fish
 ```shell
 eval "$(ghr shell fish)"
 ```
