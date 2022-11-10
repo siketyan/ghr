@@ -19,6 +19,10 @@ use crate::url::Url;
 pub struct Cmd {
     /// URL or pattern of the repository to clone.
     repo: String,
+
+    /// Change directory after cloned a repository (Shell extension required).
+    #[clap(long)]
+    cd: bool,
 }
 
 impl Cmd {
