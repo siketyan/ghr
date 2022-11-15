@@ -24,7 +24,10 @@ impl Cmd {
         let root = Root::find()?;
         let path = PartialPath {
             root: &root,
-            host: self.host.or_else(|| Some(Host::GitHub.to_string())),
+            host: match self.owner.is_some() || self.repo.is_some() {
+                true => self.host.or_else(|| Some(Host::GitHub.to_string())),
+                _ => self.host,
+            },
             owner: self.owner,
             repo: self.repo,
         };
