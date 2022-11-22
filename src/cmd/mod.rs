@@ -2,6 +2,7 @@ mod cd;
 mod clone;
 mod delete;
 mod init;
+mod open;
 mod path;
 mod profile;
 mod shell;
@@ -19,6 +20,8 @@ pub enum Action {
     Delete(delete::Cmd),
     /// Initialises a Git repository in local.
     Init(init::Cmd),
+    /// Opens a repository in an application.
+    Open(open::Cmd),
     /// Prints the path to root, owner, or a repository.
     Path(path::Cmd),
     /// Manages profiles to use in repositories.
@@ -41,6 +44,7 @@ impl Cli {
             Clone(cmd) => cmd.run().await,
             Delete(cmd) => cmd.run().await,
             Init(cmd) => cmd.run(),
+            Open(cmd) => cmd.run(),
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),
