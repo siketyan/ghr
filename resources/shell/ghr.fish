@@ -2,7 +2,7 @@
 
 function __ghr_remove
     for VAR in $argv[2..]
-        if test "$VAR" = "$1"
+        if test "$VAR" = "$argv[1]"
             continue
         end
 
