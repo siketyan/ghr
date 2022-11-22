@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
 use dirs::home_dir;
-use tracing::info;
+use tracing::debug;
 
 const ENV_VAR_KEY: &str = "GHR_ROOT";
 const DEFAULT_ROOT_NAME: &str = ".ghr";
@@ -25,7 +25,7 @@ impl Root {
                 .join(DEFAULT_ROOT_NAME),
         };
 
-        info!(
+        debug!(
             "Found a root directory: {}",
             path.to_str().unwrap_or_default(),
         );
