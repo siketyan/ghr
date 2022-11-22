@@ -3,6 +3,7 @@ use std::fs::read_to_string;
 use anyhow::Result;
 use serde::Deserialize;
 
+use crate::application::Applications;
 use crate::git::Config as GitConfig;
 use crate::profile::Profiles;
 use crate::root::Root;
@@ -14,6 +15,8 @@ pub struct Config {
     pub git: GitConfig,
     #[serde(default)]
     pub profiles: Profiles,
+    #[serde(default)]
+    pub applications: Applications,
     #[serde(default)]
     pub rules: Rules,
 }

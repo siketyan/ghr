@@ -16,7 +16,7 @@ use crate::url::Url;
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
-    /// URL or pattern of the repository to clone.
+    /// URL or pattern of the repository to delete.
     repo: String,
 }
 

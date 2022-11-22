@@ -24,6 +24,10 @@ pub struct Cmd {
     /// Change directory after cloned a repository (Shell extension required).
     #[clap(long)]
     cd: bool,
+
+    /// Opens the directory after cloned a repository.
+    #[clap(long)]
+    open: Option<String>,
 }
 
 impl Cmd {
@@ -51,11 +55,6 @@ impl Cmd {
         config.git.strategy.clone.clone_repository(url, &path)?;
 
         let repo = Repository::open(&path)?;
-        if let Some((name, p)) = profile {
-            p.apply(&mut repo.config()?)?;
-
-            info!("Attached profile [{}] successfully.", style(name).bold());
-        }
 
         tx.send(())?;
         progress.await?;
@@ -64,6 +63,21 @@ impl Cmd {
             "Cloned a repository successfully to: {}",
             repo.workdir().unwrap().to_string_lossy(),
         );
+
+        if let Some((name, p)) = profile {
+            p.apply(&mut repo.config()?)?;
+
+            info!("Attached profile [{}] successfully.", style(name).bold());
+        }
+
+        if let Some(app) = self.open {
+            config.applications.open(&app, &path)?;
+
+            info!(
+                "Opened the repository in [{}] successfully.",
+                style(&app).bold(),
+            );
+        }
 
         Ok(())
     }
