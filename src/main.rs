@@ -2,6 +2,7 @@ mod application;
 mod cmd;
 mod config;
 mod console;
+mod git;
 mod path;
 mod profile;
 mod root;

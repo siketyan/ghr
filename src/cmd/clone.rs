@@ -11,6 +11,7 @@ use tracing::info;
 
 use crate::config::Config;
 use crate::console::create_spinner;
+use crate::git::CloneRepository;
 use crate::path::Path;
 use crate::root::Root;
 use crate::url::Url;
@@ -51,7 +52,9 @@ impl Cmd {
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        let repo = Repository::clone(&url.to_string(), &path)?;
+        config.git.strategy.clone.clone_repository(url, &path)?;
+
+        let repo = Repository::open(&path)?;
 
         tx.send(())?;
         progress.await?;
