@@ -3,6 +3,7 @@ use std::fs::read_to_string;
 use anyhow::Result;
 use serde::Deserialize;
 
+use crate::application::Applications;
 use crate::profile::Profiles;
 use crate::root::Root;
 use crate::rule::Rules;
@@ -11,6 +12,8 @@ use crate::rule::Rules;
 pub struct Config {
     #[serde(default)]
     pub profiles: Profiles,
+    #[serde(default)]
+    pub applications: Applications,
     #[serde(default)]
     pub rules: Rules,
 }

@@ -1,3 +1,4 @@
+mod application;
 mod cmd;
 mod config;
 mod console;

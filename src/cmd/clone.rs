@@ -23,6 +23,10 @@ pub struct Cmd {
     /// Change directory after cloned a repository (Shell extension required).
     #[clap(long)]
     cd: bool,
+
+    /// Opens the directory after cloned a repository.
+    #[clap(long)]
+    open: Option<String>,
 }
 
 impl Cmd {
@@ -41,18 +45,13 @@ impl Cmd {
         });
 
         let url = Url::from_str(&self.repo)?;
-        let path = Path::resolve(&root, &url);
+        let path = PathBuf::from(Path::resolve(&root, &url));
         let profile = config
             .rules
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        let repo = Repository::clone(&url.to_string(), PathBuf::from(&path))?;
-        if let Some((name, p)) = profile {
-            p.apply(&mut repo.config()?)?;
-
-            info!("Attached profile [{}] successfully.", style(name).bold());
-        }
+        let repo = Repository::clone(&url.to_string(), &path)?;
 
         tx.send(())?;
         progress.await?;
@@ -61,6 +60,21 @@ impl Cmd {
             "Cloned a repository successfully to: {}",
             repo.workdir().unwrap().to_string_lossy(),
         );
+
+        if let Some((name, p)) = profile {
+            p.apply(&mut repo.config()?)?;
+
+            info!("Attached profile [{}] successfully.", style(name).bold());
+        }
+
+        if let Some(app) = self.open {
+            config.applications.open(&app, &path)?;
+
+            info!(
+                "Opened the repository in [{}] successfully.",
+                style(&app).bold(),
+            );
+        }
 
         Ok(())
     }
