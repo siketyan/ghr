@@ -12,8 +12,17 @@ To achieve that, ghq was not enough for me.
 So I have rewritten them as simple, in Rust, the robust and modern language today.
 
 ## 📦 Installation
+If you have not installed Rust environment, follow the instruction of [rustup](https://rustup.rs/).
+
 ```shell
 cargo install ghr
+```
+
+### ✨ Upgrading
+We recommend to use [cargo-update](https://github.com/nabijaczleweli/cargo-update) for upgrading.
+
+```shell
+cargo install-update ghr
 ```
 
 ### 🔧 Installing the shell extension
