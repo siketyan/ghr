@@ -17,6 +17,14 @@ use crate::url::Url;
 pub struct Cmd {
     /// URL or pattern of the repository to clone.
     repo: String,
+
+    /// Change directory after cloned a repository (Shell extension required).
+    #[clap(long)]
+    cd: bool,
+
+    /// Opens the directory after cloned a repository.
+    #[clap(long)]
+    open: Option<String>,
 }
 
 impl Cmd {
@@ -43,17 +51,27 @@ impl Cmd {
             return Ok(());
         }
 
-        let repo = Repository::init(path)?;
+        let repo = Repository::init(&path)?;
+
+        info!(
+            "Initialised a repository successfully in: {}",
+            repo.workdir().unwrap().to_string_lossy(),
+        );
+
         if let Some((name, p)) = profile {
             p.apply(&mut repo.config()?)?;
 
             info!("Attached profile [{}] successfully.", style(name).bold());
         }
 
-        info!(
-            "Initialised a repository successfully in: {}",
-            repo.workdir().unwrap().to_string_lossy(),
-        );
+        if let Some(app) = self.open {
+            config.applications.open_or_intermediate(&app, &path)?;
+
+            info!(
+                "Opened the repository in [{}] successfully.",
+                style(&app).bold(),
+            );
+        }
 
         Ok(())
     }
