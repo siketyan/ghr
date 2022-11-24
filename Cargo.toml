@@ -32,3 +32,7 @@ url = "2.3"
 
 [build-dependencies]
 build-info-build = "0.0.28"
+
+[features]
+default = []
+vendored = ["git2/vendored-libgit2", "git2/vendored-openssl"]

@@ -47,6 +47,72 @@ jobs:
           command: test
           args: --all-features
 
+  build:
+    strategy:
+      matrix:
+        target:
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-gnu
+        include:
+          - target: x86_64-pc-windows-msvc
+            host: windows-2022
+            artifact: ghr.exe
+          - target: x86_64-apple-darwin
+            host: macos-12
+            artifact: ghr
+          - target: aarch64-apple-darwin
+            host: macos-12
+            artifact: ghr
+          - target: x86_64-unknown-linux-gnu
+            host: ubuntu-22.04
+            artifact: ghr
+          - target: aarch64-unknown-linux-gnu
+            host: ubuntu-22.04
+            artifact: ghr
+            cross: true
+    runs-on: ${{ matrix.host }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install latest stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          target: ${{ matrix.target }}
+
+      - id: cache-key
+        run: echo "key=$(echo '${{ toJSON(matrix) }}' | shasum -a 256)" >> $GITHUB_OUTPUT
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ steps.cache-key.outputs.key }}
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --features vendored --target '${{ matrix.target }}'
+          use-cross: ${{ matrix.cross }}
+
+      - name: Compress artifacts into .tar.gz file
+        run: tar -C ./target/${{ matrix.target }}/release -czf ghr-${{ matrix.target }}.tar.gz ${{ matrix.artifact }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ghr-${{ matrix.target }}.tar.gz
+
+      - uses: svenstaro/upload-release-action@v2
+        if: ${{ github.event_name == 'release' }}
+        with:
+          file: ghr-${{ matrix.target }}.tar.gz
+          overwrite: true
+
   deploy:
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'release' }}
