@@ -13,6 +13,7 @@ authors = [
 
 [dependencies]
 anyhow = "1.0"
+build-info = "0.0.28"
 clap = { version = "4.0", features = ["derive"] }
 console = "0.15.2"
 dialoguer = "0.10.2"
@@ -28,6 +29,9 @@ toml = "0.5.9"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 url = "2.3"
+
+[build-dependencies]
+build-info-build = "0.0.28"
 
 [features]
 default = []

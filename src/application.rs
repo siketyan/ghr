@@ -3,7 +3,7 @@ use std::ops::Deref;
 use std::path::Path;
 use std::process::Command;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -13,6 +13,13 @@ pub struct Application {
 }
 
 impl Application {
+    pub fn intermediate(cmd: &str) -> Self {
+        Self {
+            cmd: cmd.to_string(),
+            args: vec!["%p".to_string()],
+        }
+    }
+
     pub fn open<P>(&self, path: P) -> Result<()>
     where
         P: AsRef<Path>,
@@ -40,13 +47,19 @@ pub struct Applications {
 }
 
 impl Applications {
-    pub fn open<P>(&self, name: &str, path: P) -> Result<()>
+    pub fn open<P>(&self, name: &str, path: P) -> Option<Result<()>>
     where
         P: AsRef<Path>,
     {
-        self.get(name)
-            .ok_or_else(|| anyhow!("Application entry does not exists."))?
-            .open(path)
+        self.get(name).map(|a| a.open(path))
+    }
+
+    pub fn open_or_intermediate<P>(&self, name: &str, path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        self.open(name, &path)
+            .unwrap_or_else(|| Application::intermediate(name).open(&path))
     }
 }
 
