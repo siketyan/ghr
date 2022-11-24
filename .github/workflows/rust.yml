@@ -87,7 +87,7 @@ jobs:
           target: ${{ matrix.target }}
 
       - id: cache-key
-        run: echo "::set-output name=key::$(echo '${{ toJSON(matrix) }}' | shasum -a 256)"
+        run: echo "key=$(echo '${{ toJSON(matrix) }}' | shasum -a 256)" >> $GITHUB_OUTPUT
 
       - uses: Swatinem/rust-cache@v2
         with:
