@@ -19,6 +19,14 @@ use tracing_subscriber::EnvFilter;
 
 use crate::cmd::Cli;
 
+const BUILD_INFO: &str = build_info::format!(
+    "{} v{} built with {} at {}",
+    $.crate_info.name,
+    $.crate_info.version,
+    $.compiler,
+    $.timestamp,
+);
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()

@@ -43,6 +43,7 @@ Commands:
   path     Prints the path to root, owner, or a repository
   profile  Manages profiles to use in repositories
   shell    Writes a shell script to extend ghr features
+  version  Prints the version of this application
   help     Print this message or the help of the given subcommand(s)
 
 Options:
