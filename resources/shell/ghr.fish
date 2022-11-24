@@ -17,8 +17,10 @@ end
 function ghr
     if test "$argv[1]" = "cd"
         __ghr_cd $argv[2..]
-    else if test "$argv[1]" = "clone" && contains -- "--cd" $argv[2..]
-        command ghr clone $argv[2..] && __ghr_cd (__ghr_remove "--cd" $argv[2..])
+    else if test "$argv[1]" = "clone" || test "$argv[1]" = "init"
+        if contains -- "--cd" $argv[2..]
+            command ghr "$argv[1]" $argv[2..] && __ghr_cd (__ghr_remove "--cd" $argv[2..])
+        end
     else
         command ghr $argv[1..]
     end

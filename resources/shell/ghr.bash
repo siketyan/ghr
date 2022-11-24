@@ -35,8 +35,8 @@ ghr() {
             return
         fi
 
-        if [ "$1" = "clone" ] && __ghr_contains "--cd" ${@:2}; then
-            $__GHR clone ${@:2}
+        if { [ "$1" = "clone" ] || [ "$1" = "init" ]; } && __ghr_contains "--cd" ${@:2}; then
+            $__GHR "$1" ${@:2}
             __ghr_cd ${@:2}
             return
         fi
