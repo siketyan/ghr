@@ -16,7 +16,7 @@ impl Application {
     pub fn intermediate(cmd: &str) -> Self {
         Self {
             cmd: cmd.to_string(),
-            args: vec![],
+            args: vec!["%p".to_string()],
         }
     }
 
