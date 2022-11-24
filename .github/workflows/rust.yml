@@ -96,7 +96,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --all-features
+          args: --release --all-features --target '${{ matrix.target }}'
 
       - name: Compress artifacts into .tar.gz file
         run: tar -C ./target/${{ matrix.target }}/release -czf ghr-${{ matrix.target }}.tar.gz ${{ matrix.artifact }}
