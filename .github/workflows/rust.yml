@@ -66,14 +66,12 @@ jobs:
           - target: aarch64-apple-darwin
             host: macos-12
             artifact: ghr
-            cross: true
           - target: x86_64-unknown-linux-gnu
             host: ubuntu-22.04
             artifact: ghr
           - target: aarch64-unknown-linux-gnu
             host: ubuntu-22.04
             artifact: ghr
-            cross: true
     runs-on: ${{ matrix.host }}
     steps:
       - uses: actions/checkout@v3
@@ -98,8 +96,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --all-features --target '${{ matrix.target }}'
-          use-cross: ${{ matrix.cross }}
+          args: --release --features vendored --target '${{ matrix.target }}'
 
       - name: Compress artifacts into .tar.gz file
         run: tar -C ./target/${{ matrix.target }}/release -czf ghr-${{ matrix.target }}.tar.gz ${{ matrix.artifact }}

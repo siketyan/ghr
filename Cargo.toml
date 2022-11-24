@@ -28,3 +28,7 @@ toml = "0.5.9"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 url = "2.3"
+
+[features]
+default = []
+vendored = ["git2/vendored-libgit2", "git2/vendored-openssl"]
