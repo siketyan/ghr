@@ -71,7 +71,7 @@ impl Cmd {
         }
 
         if let Some(app) = self.open {
-            config.applications.open(&app, &path)?;
+            config.applications.open_or_intermediate(&app, &path)?;
 
             info!(
                 "Opened the repository in [{}] successfully.",
