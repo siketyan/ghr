@@ -1,0 +1,38 @@
+class Ghr < Formula
+  desc "Yet another repository management with auto-attaching profiles."
+  homepage "https://github.com/siketyan/ghr"
+  version "{{tag_without_v}}"
+  license "MIT"
+
+  on_macos do
+    if Hardware::CPU.intel?
+      url "{{{assets.macos_x86_64.url}}}"
+      sha256 "{{assets.macos_x86_64.hash}}"
+    else
+      url "{{{assets.macos_aarch64.url}}}"
+      sha256 "{{assets.macos_aarch64.hash}}"
+    end
+
+    def install
+      bin.install "ghr"
+    end
+  end
+
+  on_linux do
+    if Hardware::CPU.intel?
+      url "{{{assets.linux_x86_64.url}}}"
+      sha256 "{{assets.linux_x86_64.hash}}"
+    else
+      url "{{{assets.linux_aarch64.url}}}"
+      sha256 "{{assets.linux_aarch64.hash}}"
+    end
+
+    def install
+      bin.install "ghr"
+    end
+  end
+
+  test do
+    system "#{bin}/ghr", "version"
+  end
+end
