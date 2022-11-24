@@ -95,7 +95,7 @@ jobs:
       - name: Build
         uses: actions-rs/cargo@v1
         with:
-          command: release
+          command: build
           args: --release --all-features
 
       - name: Compress artifacts into .tar.gz file
