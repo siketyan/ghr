@@ -149,7 +149,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: siketyan/release-to-registry-action@d3b8d474c2bf5e7f606e0d6d4d46a3603617c6ee
+      - uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
         with:
           path: 'Formula/ghr.rb'
           assets: |-

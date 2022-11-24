@@ -6,10 +6,10 @@ class Ghr < Formula
 
   on_macos do
     if Hardware::CPU.intel?
-      url "{{{assets.macos_x86_64.url}}}"
+      url "{{{assets.macos_x86_64.browser_download_url}}}"
       sha256 "{{assets.macos_x86_64.hash}}"
     else
-      url "{{{assets.macos_aarch64.url}}}"
+      url "{{{assets.macos_aarch64.browser_download_url}}}"
       sha256 "{{assets.macos_aarch64.hash}}"
     end
 
@@ -20,10 +20,10 @@ class Ghr < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "{{{assets.linux_x86_64.url}}}"
+      url "{{{assets.linux_x86_64.browser_download_url}}}"
       sha256 "{{assets.linux_x86_64.hash}}"
     else
-      url "{{{assets.linux_aarch64.url}}}"
+      url "{{{assets.linux_aarch64.browser_download_url}}}"
       sha256 "{{assets.linux_aarch64.hash}}"
     end
 
