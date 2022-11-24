@@ -6,6 +6,7 @@ mod open;
 mod path;
 mod profile;
 mod shell;
+mod version;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -28,6 +29,8 @@ pub enum Action {
     Profile(profile::Cmd),
     /// Writes a shell script to extend ghr features.
     Shell(shell::Cmd),
+    /// Prints the version of this application.
+    Version(version::Cmd),
 }
 
 #[derive(Debug, Parser)]
@@ -48,6 +51,7 @@ impl Cli {
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),
+            Version(cmd) => cmd.run(),
         }
     }
 }
