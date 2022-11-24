@@ -104,6 +104,18 @@ owner = "acme" # Applies company profiles to all repositories in `acme` org
 profile.name = "default"
 ```
 
+### Configuring applications to open repos in
+Edit `~/.ghr/config.toml` and add entries as you like:
+
+```toml
+[applications.vscode]
+cmd = "code"
+args = ["%p"]
+```
+
+> **Note**
+> `%p` will be replaced by the repository path.
+
 ### Finding path of the repository
 ```shell
 ghr path # Root directory
