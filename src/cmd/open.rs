@@ -26,7 +26,9 @@ impl Cmd {
         let url = Url::from_str(&self.repo)?;
         let path = PathBuf::from(Path::resolve(&root, &url));
 
-        config.applications.open(&self.application, path)?;
+        config
+            .applications
+            .open_or_intermediate(&self.application, path)?;
 
         Ok(())
     }
