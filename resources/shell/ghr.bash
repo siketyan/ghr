@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -eu
-
 __GHR=$(which ghr | head -n 1)
 
 __ghr_cd() {
