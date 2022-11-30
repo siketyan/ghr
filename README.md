@@ -96,7 +96,7 @@ ghr cd <url_or_pattern>
 ```
 
 ### Attaching profiles
-Create `~/.ghr/config.toml` and edit as you like:
+Create `~/.ghr/ghr.toml` and edit as you like:
 
 ```toml
 [profiles.default]
@@ -116,7 +116,7 @@ profile.name = "default"
 ```
 
 ### Configuring applications to open repos in
-Edit `~/.ghr/config.toml` and add entries as you like:
+Edit `~/.ghr/ghr.toml` and add entries as you like:
 
 ```toml
 [applications.vscode]
