@@ -12,14 +12,25 @@ To achieve that, ghq was not enough for me.
 So I have rewritten them as simple, in Rust, the robust and modern language today.
 
 ## 📦 Installation
+### Using Homebrew (easy)
+```shell
+brew install siketyan/tap/ghr
+```
+
+To upgrade:
+
+```shell
+brew upgrade siketyan/tap/ghr
+```
+
+### Using cargo (classic)
 If you have not installed Rust environment, follow the instruction of [rustup](https://rustup.rs/).
 
 ```shell
 cargo install ghr
 ```
 
-### ✨ Upgrading
-We recommend to use [cargo-update](https://github.com/nabijaczleweli/cargo-update) for upgrading.
+For upgrading, we recommend to use [cargo-update](https://github.com/nabijaczleweli/cargo-update).
 
 ```shell
 cargo install-update ghr
