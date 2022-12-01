@@ -3,7 +3,6 @@ use std::path::Path;
 
 use anyhow::Result;
 use serde::Deserialize;
-use tracing::warn;
 
 use crate::application::Applications;
 use crate::git::Config as GitConfig;
@@ -25,17 +24,7 @@ pub struct Config {
 
 impl Config {
     pub fn load_from(root: &Root) -> Result<Self> {
-        Ok(match Self::load_from_path(root.path().join("ghr.toml"))? {
-            Some(c) => c,
-            None => {
-                warn!(
-                    "Using `config.toml` is deprecated since ghr v0.2.3 and \
-                    it won't be supported from v0.3. Move them to `ghr.toml` to migrate.",
-                );
-
-                Self::load_from_path(root.path().join("config.toml"))?.unwrap_or_default()
-            }
-        })
+        Ok(Self::load_from_path(root.path().join("ghr.toml"))?.unwrap_or_default())
     }
 
     pub fn load() -> Result<Self> {
