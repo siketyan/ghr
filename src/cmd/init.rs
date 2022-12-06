@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use std::str::FromStr;
 
 use anyhow::Result;
 use clap::Parser;
@@ -32,7 +31,7 @@ impl Cmd {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
-        let url = Url::from_str(&self.repo)?;
+        let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
         let path = Path::resolve(&root, &url);
         let profile = config
             .rules

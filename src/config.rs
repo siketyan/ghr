@@ -11,7 +11,14 @@ use crate::root::Root;
 use crate::rule::Rules;
 
 #[derive(Debug, Default, Deserialize)]
+pub struct Defaults {
+    pub owner: Option<String>,
+}
+
+#[derive(Debug, Default, Deserialize)]
 pub struct Config {
+    #[serde(default)]
+    pub defaults: Defaults,
     #[serde(default)]
     pub git: GitConfig,
     #[serde(default)]

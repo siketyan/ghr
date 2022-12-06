@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use std::str::FromStr;
 use std::sync::mpsc::channel;
 use std::time::Duration;
 
@@ -45,7 +44,7 @@ impl Cmd {
             p.finish_and_clear();
         });
 
-        let url = Url::from_str(&self.repo)?;
+        let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
         let path = PathBuf::from(Path::resolve(&root, &url));
         let profile = config
             .rules

@@ -87,6 +87,17 @@ If you have installed the shell extension, you can change directory into the clo
 ghr clone <url_or_pattern> --cd
 ```
 
+If you often use repositories of a specific owner, you can set the default owner to be resolved.
+
+```toml
+[defaults]
+owner = "siketyan"
+```
+
+```shell
+ghr clone <repo>
+```
+
 ### Changing directory
 You can change directory into a repository on the shell.
 It requires installing the shell extension.

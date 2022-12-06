@@ -1,8 +1,8 @@
 use std::path::PathBuf;
-use std::str::FromStr;
 use std::sync::mpsc::channel;
 use std::time::Duration;
 
+use crate::config::Config;
 use anyhow::Result;
 use clap::Parser;
 use console::style;
@@ -23,6 +23,7 @@ pub struct Cmd {
 impl Cmd {
     pub async fn run(self) -> Result<()> {
         let root = Root::find()?;
+        let config = Config::load_from(&root)?;
 
         if !Confirm::new()
             .with_prompt(format!(
@@ -34,7 +35,7 @@ impl Cmd {
             return Ok(());
         }
 
-        let url = Url::from_str(&self.repo)?;
+        let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
         let path = PathBuf::from(Path::resolve(&root, &url));
 
         let (tx, rx) = channel();
