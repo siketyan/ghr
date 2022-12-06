@@ -286,6 +286,21 @@ mod tests {
     }
 
     #[test]
+    fn parse_from_pattern_repo() {
+        assert_eq!(
+            Url {
+                vcs: Vcs::Git,
+                scheme: Scheme::Https,
+                user: None,
+                host: Host::GitHub,
+                owner: "siketyan".to_string(),
+                repo: "siketyan.github.io".to_string()
+            },
+            Url::from_pattern("siketyan.github.io", Some("siketyan")).unwrap(),
+        )
+    }
+
+    #[test]
     fn parse_from_pattern_org_repo() {
         assert_eq!(
             Url {
@@ -296,7 +311,7 @@ mod tests {
                 owner: "siketyan".to_string(),
                 repo: "siketyan.github.io".to_string()
             },
-            Url::from_pattern("siketyan/siketyan.github.io").unwrap(),
+            Url::from_pattern("siketyan/siketyan.github.io", None).unwrap(),
         )
     }
 
@@ -311,7 +326,7 @@ mod tests {
                 owner: "siketyan".to_string(),
                 repo: "siketyan.github.io".to_string()
             },
-            Url::from_pattern("gitlab.com:siketyan/siketyan.github.io").unwrap(),
+            Url::from_pattern("gitlab.com:siketyan/siketyan.github.io", None).unwrap(),
         )
     }
 
@@ -326,7 +341,7 @@ mod tests {
                 owner: "siketyan".to_string(),
                 repo: "siketyan.github.io".to_string()
             },
-            Url::from_pattern("git@github.com:siketyan/siketyan.github.io.git").unwrap(),
+            Url::from_pattern("git@github.com:siketyan/siketyan.github.io.git", None).unwrap(),
         )
     }
 
