@@ -1,15 +1,14 @@
+use std::future::ready;
 use std::path::PathBuf;
-use std::sync::mpsc::channel;
-use std::time::Duration;
 
-use crate::config::Config;
 use anyhow::Result;
 use clap::Parser;
 use console::style;
 use dialoguer::Confirm;
 use tracing::info;
 
-use crate::console::create_spinner;
+use crate::config::Config;
+use crate::console::Spinner;
 use crate::path::Path;
 use crate::root::Root;
 use crate::url::Url;
@@ -38,19 +37,9 @@ impl Cmd {
         let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
         let path = PathBuf::from(Path::resolve(&root, &url));
 
-        let (tx, rx) = channel();
-        let progress = tokio::spawn(async move {
-            let p = create_spinner("Deleting the repository...");
-            while rx.recv_timeout(Duration::from_millis(100)).is_err() {
-                p.tick();
-            }
-
-            p.finish_and_clear();
-        });
-
-        std::fs::remove_dir_all(&path)?;
-        tx.send(())?;
-        progress.await?;
+        Spinner::new("Deleting the repository...")
+            .spin_while(|| ready(std::fs::remove_dir_all(&path).map_err(anyhow::Error::from)))
+            .await?;
 
         info!(
             "Deleted the repository successfully: {}",

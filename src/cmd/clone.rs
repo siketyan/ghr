@@ -1,6 +1,4 @@
 use std::path::PathBuf;
-use std::sync::mpsc::channel;
-use std::time::Duration;
 
 use anyhow::Result;
 use clap::Parser;
@@ -9,7 +7,7 @@ use git2::Repository;
 use tracing::info;
 
 use crate::config::Config;
-use crate::console::create_spinner;
+use crate::console::Spinner;
 use crate::git::{CloneOptions, CloneRepository};
 use crate::path::Path;
 use crate::root::Root;
@@ -38,16 +36,6 @@ impl Cmd {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
-        let (tx, rx) = channel();
-        let progress = tokio::spawn(async move {
-            let p = create_spinner("Cloning the repository...");
-            while rx.recv_timeout(Duration::from_millis(100)).is_err() {
-                p.tick();
-            }
-
-            p.finish_and_clear();
-        });
-
         let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
         let path = PathBuf::from(Path::resolve(&root, &url));
         let profile = config
@@ -55,18 +43,22 @@ impl Cmd {
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        config.git.strategy.clone.clone_repository(
-            url,
-            &path,
-            &CloneOptions {
-                recursive: self.recursive,
-            },
-        )?;
+        let repo = Spinner::new("Cloning the repository...")
+            .spin_while(|| {
+                let path = path.clone();
+                async move {
+                    config.git.strategy.clone.clone_repository(
+                        url,
+                        &path,
+                        &CloneOptions {
+                            recursive: self.recursive,
+                        },
+                    )?;
 
-        let repo = Repository::open(&path)?;
-
-        tx.send(())?;
-        progress.await?;
+                    Ok::<_, anyhow::Error>(Repository::open(&path)?)
+                }
+            })
+            .await?;
 
         info!(
             "Cloned a repository successfully to: {}",
