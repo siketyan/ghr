@@ -92,6 +92,13 @@ pub struct Url {
 }
 
 impl Url {
+    pub fn from_str(s: &str, default_owner: Option<&str>) -> Result<Self> {
+        match s.contains("://") {
+            true => Self::from_url(&url::Url::from_str(s)?),
+            _ => Self::from_pattern(s, default_owner),
+        }
+    }
+
     fn from_url(url: &url::Url) -> Result<Self> {
         let mut segments = url
             .path_segments()
@@ -120,8 +127,11 @@ impl Url {
         })
     }
 
-    fn from_pattern(s: &str) -> Result<Self> {
+    fn from_pattern(s: &str, default_owner: Option<&str>) -> Result<Self> {
         lazy_static! {
+            static ref REPO: Regex =
+                Regex::new(r"^(?P<repo>[0-9A-Za-z_\.\-]+)$").unwrap();
+
             static ref ORG_REPO: Regex =
                 Regex::new(r"^(?P<org>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$").unwrap();
 
@@ -150,6 +160,14 @@ impl Url {
                     .map(|o| o.as_str().to_string())
                     .unwrap_or_default()
             };
+        }
+
+        if let Some(owner) = default_owner {
+            pattern!(REPO, |c: Captures| Ok(Self {
+                owner: owner.to_string(),
+                repo: Self::remove_extensions(&group!(c, "repo")),
+                ..Default::default()
+            }));
         }
 
         pattern!(ORG_REPO, |c: Captures| Ok(Self {
@@ -195,10 +213,7 @@ impl FromStr for Url {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
-        match s.contains("://") {
-            true => Self::from_url(&url::Url::from_str(s)?),
-            _ => Self::from_pattern(s),
-        }
+        Url::from_str(s, None)
     }
 }
 
