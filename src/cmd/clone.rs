@@ -11,7 +11,7 @@ use tracing::info;
 
 use crate::config::Config;
 use crate::console::create_spinner;
-use crate::git::CloneRepository;
+use crate::git::{CloneOptions, CloneRepository};
 use crate::path::Path;
 use crate::root::Root;
 use crate::url::Url;
@@ -20,6 +20,10 @@ use crate::url::Url;
 pub struct Cmd {
     /// URL or pattern of the repository to clone.
     repo: String,
+
+    /// Clones their submodules recursively.
+    #[clap(short, long)]
+    recursive: bool,
 
     /// Change directory after cloned a repository (Shell extension required).
     #[clap(long)]
@@ -52,7 +56,13 @@ impl Cmd {
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        config.git.strategy.clone.clone_repository(url, &path)?;
+        config.git.strategy.clone.clone_repository(
+            url,
+            &path,
+            &CloneOptions {
+                recursive: self.recursive,
+            },
+        )?;
 
         let repo = Repository::open(&path)?;
 
