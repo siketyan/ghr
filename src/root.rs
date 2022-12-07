@@ -9,6 +9,7 @@ use tracing::debug;
 const ENV_VAR_KEY: &str = "GHR_ROOT";
 const DEFAULT_ROOT_NAME: &str = ".ghr";
 
+#[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Root {
     path: PathBuf,
 }

@@ -5,6 +5,7 @@ mod console;
 mod git;
 mod path;
 mod profile;
+mod repository;
 mod root;
 mod rule;
 mod url;
