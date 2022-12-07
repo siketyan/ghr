@@ -1,7 +1,9 @@
 use crate::root::Root;
 use crate::url::Url;
+use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 
+#[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Path<'a> {
     root: &'a Root,
     host: String,
@@ -10,6 +12,20 @@ pub struct Path<'a> {
 }
 
 impl<'a> Path<'a> {
+    pub fn new(
+        root: &'a Root,
+        host: impl Into<String>,
+        owner: impl Into<String>,
+        repo: impl Into<String>,
+    ) -> Self {
+        Self {
+            root,
+            host: host.into(),
+            owner: owner.into(),
+            repo: repo.into(),
+        }
+    }
+
     pub fn resolve(root: &'a Root, url: &Url) -> Self {
         Self {
             root,
@@ -17,6 +33,12 @@ impl<'a> Path<'a> {
             owner: url.owner.clone(),
             repo: url.repo.clone(),
         }
+    }
+}
+
+impl<'a> Display for Path<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}:{}/{}", self.host, self.owner, self.repo)
     }
 }
 

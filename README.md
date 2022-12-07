@@ -59,6 +59,7 @@ Commands:
   clone    Clones a Git repository to local
   delete   Deletes a repository from local
   init     Initialises a Git repository in local
+  list     Lists all managed repositories
   open     Opens a repository in an application
   path     Prints the path to root, owner, or a repository
   profile  Manages profiles to use in repositories
