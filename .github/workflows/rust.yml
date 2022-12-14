@@ -47,6 +47,11 @@ jobs:
           command: test
           args: --all-features
 
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@main
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
   build:
     strategy:
       matrix:
