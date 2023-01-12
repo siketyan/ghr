@@ -39,12 +39,10 @@ impl Cmd {
 
         let repo: Vec<CloneResult> = Spinner::new("Cloning the repository...")
             .spin_while(|| async move {
-                Ok::<_, anyhow::Error>(
-                    self.repo
-                        .iter()
-                        .map(|repo| self.clone(&root, &config, repo))
-                        .try_collect()?,
-                )
+                self.repo
+                    .iter()
+                    .map(|repo| self.clone(&root, &config, repo))
+                    .try_collect()
             })
             .await?;
 
@@ -80,7 +78,7 @@ impl Cmd {
 
     fn clone(&self, root: &Root, config: &Config, repo: &str) -> Result<CloneResult> {
         let url = Url::from_str(repo, config.defaults.owner.as_deref())?;
-        let path = PathBuf::from(Path::resolve(&root, &url));
+        let path = PathBuf::from(Path::resolve(root, &url));
         let profile = config
             .rules
             .resolve(&url)
@@ -103,7 +101,7 @@ impl Cmd {
         };
 
         let open = if let Some(app) = &self.open {
-            config.applications.open_or_intermediate(&app, &path)?;
+            config.applications.open_or_intermediate(app, &path)?;
             Some(app.to_string())
         } else {
             None
