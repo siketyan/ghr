@@ -13,12 +13,12 @@ authors = [
 
 [dependencies]
 anyhow = "1.0"
-build-info = "0.0.28"
+build-info = "0.0.29"
 clap = { version = "4.0", features = ["derive"] }
 console = "0.15.2"
 dialoguer = "0.10.2"
 dirs = "4.0"
-git2 = "0.15.0"
+git2 = "0.16.0"
 itertools = "0.10.5"
 indicatif = "0.17.1"
 lazy_static = "1.4"
@@ -32,7 +32,7 @@ url = "2.3"
 walkdir = "2.3"
 
 [build-dependencies]
-build-info-build = "0.0.28"
+build-info-build = "0.0.29"
 
 [features]
 default = []
