@@ -26,6 +26,13 @@ __ghr_remove() {
     done
 }
 
+__ghr_complete() {
+    PREFIX="$(echo "${COMP_WORDS[@]:2:$COMP_CWORD}" | sed 's/ //g')"
+    LIST="$(ghr list | grep "^$PREFIX")"
+    SUGGESTIONS="$(for S in $LIST; do echo "${S#"$PREFIX"}"; done)"
+    COMPREPLY=($(compgen -W "$SUGGESTIONS" -- "${COMP_WORDS[$COMP_CWORD]}"))
+}
+
 ghr() {
     if [ "$#" -gt 1 ]; then
         if [ "$1" = "cd" ]; then
@@ -42,3 +49,6 @@ ghr() {
 
     $__GHR $@
 }
+
+complete -F __ghr_complete ghr cd
+complete -F __ghr_complete ghr path
