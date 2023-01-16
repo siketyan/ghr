@@ -34,6 +34,15 @@ impl<'a> Path<'a> {
             repo: url.repo.clone(),
         }
     }
+
+    pub fn to_string_with(&self, host: bool, owner: bool) -> String {
+        match (host, owner) {
+            (false, true) => format!("{}/{}", self.owner, self.repo),
+            (true, false) => format!("{}:{}", self.host, self.repo),
+            (false, false) => format!("{}", self.repo),
+            _ => format!("{}:{}/{}", self.host, self.owner, self.repo),
+        }
+    }
 }
 
 impl<'a> Display for Path<'a> {
