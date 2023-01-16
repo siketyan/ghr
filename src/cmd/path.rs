@@ -10,14 +10,20 @@ use crate::url::{Host, Url};
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
+    /// Shows the relative path from the root instead of absolute one.
+    #[clap(short, long)]
+    relative: bool,
+
     /// Remote host of the repository.
     /// Defaults to github.com.
     #[clap(long)]
     host: Option<String>,
+
     /// Owner name of the repository.
     /// Defaults to the default owner if it is configured.
     #[clap(short, long)]
     owner: Option<String>,
+
     /// Repository name.
     repo: Option<String>,
 }
@@ -52,7 +58,13 @@ impl Cmd {
             ));
         }
 
-        println!("{}", path.to_string_lossy());
+        println!(
+            "{}",
+            match self.relative {
+                true => path.strip_prefix(root.path())?.to_string_lossy(),
+                _ => path.to_string_lossy(),
+            },
+        );
 
         Ok(())
     }
