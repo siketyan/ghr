@@ -142,11 +142,12 @@ args = ["%p"]
 ### Finding path of the repository
 ```shell
 ghr path # Root directory
-ghr path <owner> # Owner root
-ghr path <owner> <repo> # Repository directory
+ghr path <owner>/<repo> # Repository directory
+ghr path <url> # Repository directory resolved by URL
+ghr path github.com/<owner>/<repo> # Repository directory of the specified host
+ghr path --owner=<owner> # Owner root
 ghr path --host=github.com # Host root
-ghr path --host=github.com <owner> # Owner root of the specified host
-ghr path --host=github.com <owner> <repo> # Repository directory of the specified host
+ghr path --host=github.com --owner=<owner> # Owner root of the specified host
 ```
 
 ## 🛠 Customising
