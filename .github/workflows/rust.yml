@@ -149,7 +149,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
+      - name: Release to Homebrew Tap
+        uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
         with:
           path: 'Formula/ghr.rb'
           assets: |-
@@ -162,6 +163,21 @@ jobs:
           token: '${{ secrets.HOMEBREW_TAP_TOKEN }}'
           hash: 'sha256'
           targetRepo: 'homebrew-tap'
+          branch: 'ghr/${{ github.event.release.tag_name }}'
+          author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+          committer: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+
+      - name: Release to Scoop Bucket
+        uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
+        with:
+          path: 'ghr.json'
+          assets: |-
+            windows_x86_64=ghr-x86_64-pc-windows-msvc.tar.gz
+          message: 'feat(ghr): Release ${{ github.event.release.tag_name }}'
+          template: './resources/scoop/ghr.json.mustache'
+          token: '${{ secrets.SCOOP_BUCKET_TOKEN }}'
+          hash: 'sha256'
+          targetRepo: 'scoop-bucket'
           branch: 'ghr/${{ github.event.release.tag_name }}'
           author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
           committer: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
