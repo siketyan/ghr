@@ -1,136 +1,75 @@
+#!/usr/bin/env bash
+
+__ghr_complete__static() {
+  local options
+
+  options=("${@:2}")
+
+  compgen -W "${options[*]}" -- "$1"
+}
+
+__ghr_complete__repos() {
+  local repositories suggestions
+
+  repositories="$(ghr list)"
+  suggestions="$(compgen -W "${repositories}" -- "$1")"
+
+  if [[ $1 != -* && ${COMP_CWORD} -ne 2 ]]; then
+    return
+  fi
+
+  echo "$suggestions"
+}
+
+__ghr_complete_cd() {
+  __ghr_complete__repos "$1"
+}
+
 __ghr_complete() {
-  local i cur prev opts cmds
-  COMPREPLY=()
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  prev="${COMP_WORDS[COMP_CWORD - 1]}"
-  cmd=""
-  opts=""
+  local cword
 
-  for i in ${COMP_WORDS[@]}; do
-    case "${i}" in
-    "$1")
-      cmd="ghr"
-      ;;
-    cd)
-      cmd+="__cd"
-      ;;
-    clone)
-      cmd+="__clone"
-      ;;
-    delete)
-      cmd+="__delete"
-      ;;
-    init)
-      cmd+="__init"
-      ;;
-    open)
-      cmd+="__open"
-      ;;
-    path)
-      cmd+="__path"
-      ;;
-    profile)
-      cmd+="__profile"
-      ;;
-    shell)
-      cmd+="__shell"
-      ;;
-    version)
-      cmd+="__version"
-      ;;
-    help)
-      cmd+="__help"
-      ;;
-    *) ;;
-    esac
-  done
+  # Replaces ':' in $COMP_WORDBREAKS to prevent bash appends the suggestion after ':' repeatedly
+  COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
 
-  case "${cmd}" in
-  ghr)
-    opts="--help cd clone delete help init open path profile shell version"
-    if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]]; then
-      COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-      return 0
-    fi
-    case "${prev}" in
-    *)
-      COMPREPLY=()
-      ;;
-    esac
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
-    ;;
-  ghr__cd)
-    COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
-    opts="$(ghr list)"
+  cword="${COMP_WORDS[COMP_CWORD]}"
 
-    if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]]; then
-      COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-      return 0
-    fi
-    case "${prev}" in
-    *)
-      COMPREPLY=()
-      ;;
-    esac
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
+  if [ "${COMP_CWORD}" = 1 ]; then
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help cd clone delete help init open path profile shell version))
     return 0
-    ;;
-  ghr__clone)
-    opts="--help"
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
-    ;;
-  ghr__delete)
-    opts="--help"
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
-    ;;
-  ghr__init)
-    opts="--help"
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
-    ;;
-  ghr__open)
-    opts="--help"
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
-    ;;
-  ghr__path)
-    COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
-    opts="$(ghr list)"
+  fi
 
-    if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]]; then
-      COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-      return 0
-    fi
-    case "${prev}" in
-    *)
-      COMPREPLY=()
-      ;;
-    esac
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
+  case "${COMP_WORDS[1]}" in
+  cd)
+    COMPREPLY=($(__ghr_complete__repos "${cword}"))
     ;;
-  ghr__profile)
-    opts="--help"
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
+  clone)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
-  ghr__shell)
-    opts="bash fish"
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
+  delete)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
-  ghr__version)
-    opts=""
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
+  init)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
-  ghr__help)
-    opts=""
-    COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-    return 0
+  open)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
+  path)
+    COMPREPLY=($(__ghr_complete__repos "${cword}"))
+    ;;
+  profile)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
+  shell)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
+  version)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
+  help)
+    COMPREPLY=()
+    ;;
+  *)
     ;;
   esac
 }
@@ -152,5 +91,3 @@ if [[ -n ${ZSH_VERSION-} ]]; then
 fi
 
 complete -F __ghr_complete -o bashdefault -o default ghr
-
-# END ghr completion
