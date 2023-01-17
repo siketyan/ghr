@@ -21,10 +21,6 @@ __ghr_complete__repos() {
   echo "$suggestions"
 }
 
-__ghr_complete_cd() {
-  __ghr_complete__repos "$1"
-}
-
 __ghr_complete() {
   local cword
 
