@@ -42,3 +42,5 @@ ghr() {
 
     $__GHR $@
 }
+
+source ./ghr-completion.bash
