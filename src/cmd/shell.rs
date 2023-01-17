@@ -33,8 +33,8 @@ pub struct Cmd {
 impl Cmd {
     pub fn run(self) -> Result<()> {
         let script = match self.kind {
-            Kind::Bash => include_str!("../../resources/shell/ghr.bash"),
-            Kind::Fish => include_str!("../../resources/shell/ghr.fish"),
+            Kind::Bash => include_str!("../../resources/shell/bash/ghr.bash"),
+            Kind::Fish => include_str!("../../resources/shell/fish/ghr.fish"),
         };
 
         print!("{}", script);
