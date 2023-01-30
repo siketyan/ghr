@@ -14,7 +14,7 @@ authors = [
 [dependencies]
 anyhow = "1.0"
 build-info = "0.0.29"
-clap = { version = "4.0", features = ["derive"] }
+clap = { version = "4.1", features = ["derive"] }
 console = "0.15.2"
 dialoguer = "0.10.2"
 dirs = "4.0"
