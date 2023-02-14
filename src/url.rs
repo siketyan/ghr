@@ -1,18 +1,195 @@
 use std::convert::Infallible;
 use std::str::FromStr;
 
-use anyhow::{anyhow, bail, Error, Result};
+use anyhow::{anyhow, Error, Result};
 use itertools::FoldWhile;
 use itertools::Itertools;
 use lazy_static::lazy_static;
-use regex::{Captures, Regex};
+use regex::Regex;
+use serde::Deserialize;
+use serde_with::DeserializeFromStr;
 
 const GITHUB_COM: &str = "github.com";
 
 const GIT_EXTENSION: &str = ".git";
 const EXTENSIONS: &[&str] = &[GIT_EXTENSION];
 
-#[derive(Debug, Default, Eq, PartialEq)]
+lazy_static! {
+    static ref SSH: Pattern = Pattern::from(
+        Regex::new(r"^(?P<user>[0-9A-Za-z\-]+)@(?P<host>[0-9A-Za-z\.\-]+):(?P<owner>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$")
+            .unwrap(),
+    )
+        .with_scheme(Scheme::Ssh)
+        .with_infer();
+
+    static ref HOST_ORG_REPO: Pattern = Pattern::from(
+        Regex::new(r"^(?P<host>[0-9A-Za-z\.\-]+)[:/](?P<owner>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$")
+            .unwrap(),
+    )
+        .with_infer();
+
+    static ref ORG_REPO: Pattern = Pattern::from(
+        Regex::new(r"^(?P<owner>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$")
+            .unwrap(),
+    )
+        .with_infer();
+
+    static ref REPO: Pattern = Pattern::from(
+        Regex::new(r"^(?P<repo>[0-9A-Za-z_\.\-]+)$")
+            .unwrap(),
+    )
+        .with_infer();
+}
+
+#[derive(Debug)]
+pub struct Match {
+    pub vcs: Option<Vcs>,
+    pub scheme: Option<Scheme>,
+    pub user: Option<String>,
+    pub host: Option<Host>,
+    pub owner: Option<String>,
+    pub repo: String,
+    pub raw: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Pattern {
+    #[serde(with = "serde_regex")]
+    regex: Regex,
+    vcs: Option<Vcs>,
+    scheme: Option<Scheme>,
+    user: Option<String>,
+    host: Option<Host>,
+    owner: Option<String>,
+    url: Option<String>,
+    infer: bool,
+}
+
+impl Pattern {
+    #[inline]
+    pub fn with_scheme(mut self, s: Scheme) -> Self {
+        self.scheme = Some(s);
+        self
+    }
+
+    #[inline]
+    pub fn with_infer(mut self) -> Self {
+        self.infer = true;
+        self
+    }
+
+    pub fn matches(&self, s: &str) -> Option<Match> {
+        self.regex.captures(s).and_then(|c| {
+            let repo = match c.name("repo") {
+                Some(v) => v.as_str().to_string(),
+                _ => return None,
+            };
+
+            let mut m = Match {
+                vcs: c
+                    .name("vcs")
+                    .and_then(|v| Vcs::from_str(v.as_str()).ok())
+                    .or(self.vcs),
+                scheme: c
+                    .name("scheme")
+                    .and_then(|v| Scheme::from_str(v.as_str()).ok())
+                    .or(self.scheme),
+                user: c
+                    .name("user")
+                    .map(|v| v.as_str().to_string())
+                    .or(self.user.clone()),
+                host: c
+                    .name("host")
+                    .and_then(|v| Host::from_str(v.as_str()).ok())
+                    .or(self.host.clone()),
+                owner: c
+                    .name("owner")
+                    .map(|v| v.as_str().to_string())
+                    .or(self.owner.clone()),
+                repo,
+                raw: None,
+            };
+
+            m.raw = match self.infer {
+                true => None,
+                _ => self
+                    .url
+                    .as_ref()
+                    .map(|u| {
+                        u.replace("{{vcs}}", &m.vcs.map(|v| v.to_string()).unwrap_or_default())
+                            .replace(
+                                "{{scheme}}",
+                                &m.scheme.map(|s| s.to_string()).unwrap_or_default(),
+                            )
+                            .replace("{{user}}", &m.user.clone().unwrap_or_default())
+                            .replace(
+                                "{{host}}",
+                                &m.host.clone().map(|h| h.to_string()).unwrap_or_default(),
+                            )
+                            .replace("{{owner}}", &m.owner.clone().unwrap_or_default())
+                            .replace("{{repo}}", &m.repo)
+                    })
+                    .or(Some(s.to_string())),
+            };
+
+            Some(m)
+        })
+    }
+}
+
+impl From<Regex> for Pattern {
+    fn from(value: Regex) -> Self {
+        Self {
+            regex: value,
+            vcs: None,
+            scheme: None,
+            user: None,
+            host: None,
+            owner: None,
+            url: None,
+            infer: false,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Patterns(Vec<Pattern>);
+
+impl Patterns {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+
+    #[inline]
+    pub fn add(&mut self, p: Pattern) {
+        self.0.push(p);
+    }
+
+    #[inline]
+    pub fn with(mut self, p: Pattern) -> Self {
+        self.add(p);
+        self
+    }
+
+    pub fn with_defaults(self) -> Self {
+        self.with(SSH.clone())
+            .with(HOST_ORG_REPO.clone())
+            .with(ORG_REPO.clone())
+            .with(REPO.clone())
+    }
+
+    pub fn matches(&self, s: &str) -> Option<Match> {
+        self.0.iter().find_map(|p| p.matches(s))
+    }
+}
+
+impl Default for Patterns {
+    fn default() -> Self {
+        Self::new().with_defaults()
+    }
+}
+
+#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, DeserializeFromStr)]
 pub enum Vcs {
     #[default]
     Git,
@@ -35,7 +212,26 @@ impl Vcs {
     }
 }
 
-#[derive(Debug, Default, Eq, PartialEq)]
+impl FromStr for Vcs {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        Ok(match s.to_ascii_lowercase().as_str() {
+            "git" => Self::Git,
+            _ => Err(anyhow!("Unknown VCS found: {}", s))?,
+        })
+    }
+}
+
+impl ToString for Vcs {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Git => "git".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, DeserializeFromStr)]
 pub enum Scheme {
     #[default]
     Https,
@@ -54,7 +250,17 @@ impl FromStr for Scheme {
     }
 }
 
-#[derive(Debug, Default, Eq, PartialEq)]
+impl ToString for Scheme {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Https => "https",
+            Self::Ssh => "ssh",
+        }
+        .to_string()
+    }
+}
+
+#[derive(Debug, Clone, Default, Eq, PartialEq, DeserializeFromStr)]
 pub enum Host {
     #[default]
     GitHub,
@@ -89,13 +295,14 @@ pub struct Url {
     pub host: Host,
     pub owner: String,
     pub repo: String,
+    pub raw: Option<String>,
 }
 
 impl Url {
-    pub fn from_str(s: &str, default_owner: Option<&str>) -> Result<Self> {
+    pub fn from_str(s: &str, p: &Patterns, default_owner: Option<&str>) -> Result<Self> {
         match s.contains("://") {
             true => Self::from_url(&url::Url::from_str(s)?),
-            _ => Self::from_pattern(s, default_owner),
+            _ => Self::from_pattern(s, p, default_owner),
         }
     }
 
@@ -104,9 +311,11 @@ impl Url {
             .path_segments()
             .ok_or_else(|| anyhow!("Could not parse path segments from the URL: {}", url))?;
 
+        let scheme = Scheme::from_str(url.scheme())?;
+
         Ok(Self {
             vcs: Vcs::from_url(url),
-            scheme: Scheme::from_str(url.scheme())?,
+            scheme,
             user: match url.username().is_empty() {
                 true => None,
                 _ => Some(url.username().to_string()),
@@ -124,75 +333,31 @@ impl Url {
                     anyhow!("Could not find repository name from the URL: {}", url)
                 })?,
             ),
+            raw: match scheme {
+                // HTTPS URLs can be used directly on cloning, so we prefer it than inferred one.
+                // SSH URLs are not; Git only accepts 'git@github.com:org/repo.git' style.
+                Scheme::Https => Some(url.to_string()),
+                _ => None,
+            },
         })
     }
 
-    fn from_pattern(s: &str, default_owner: Option<&str>) -> Result<Self> {
-        lazy_static! {
-            static ref REPO: Regex =
-                Regex::new(r"^(?P<repo>[0-9A-Za-z_\.\-]+)$").unwrap();
+    fn from_match(m: Match, default_owner: Option<&str>) -> Option<Self> {
+        Some(Self {
+            vcs: m.vcs.unwrap_or_default(),
+            scheme: m.scheme.unwrap_or_default(),
+            user: m.user,
+            host: m.host.unwrap_or_default(),
+            owner: m.owner.or_else(|| default_owner.map(|s| s.to_string()))?,
+            repo: Self::remove_extensions(&m.repo),
+            raw: m.raw,
+        })
+    }
 
-            static ref ORG_REPO: Regex =
-                Regex::new(r"^(?P<org>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$").unwrap();
-
-            static ref HOST_ORG_REPO: Regex =
-                Regex::new(r"^(?P<host>[0-9A-Za-z\.\-]+)[:/](?P<org>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$").unwrap();
-
-            static ref SSH: Regex =
-                Regex::new(r"^(?P<user>[0-9A-Za-z\-]+)@(?P<host>[0-9A-Za-z\.\-]+):(?P<org>[0-9A-Za-z_\.\-]+)/(?P<repo>[0-9A-Za-z_\.\-]+)$").unwrap();
-        }
-
-        macro_rules! pattern {
-            ($n: ident, $f: expr) => {
-                if $n.is_match(s) {
-                    let captures: Captures = $n
-                        .captures(s)
-                        .ok_or_else(|| anyhow!("Could not capture from the pattern"))?;
-
-                    return $f(captures);
-                }
-            };
-        }
-
-        macro_rules! group {
-            ($c: expr, $n: literal) => {
-                $c.name($n)
-                    .map(|o| o.as_str().to_string())
-                    .unwrap_or_default()
-            };
-        }
-
-        if let Some(owner) = default_owner {
-            pattern!(REPO, |c: Captures| Ok(Self {
-                owner: owner.to_string(),
-                repo: Self::remove_extensions(&group!(c, "repo")),
-                ..Default::default()
-            }));
-        }
-
-        pattern!(ORG_REPO, |c: Captures| Ok(Self {
-            owner: group!(c, "org"),
-            repo: Self::remove_extensions(&group!(c, "repo")),
-            ..Default::default()
-        }));
-
-        pattern!(HOST_ORG_REPO, |c: Captures| Ok(Self {
-            host: Host::from_str(group!(c, "host").as_str())?,
-            owner: group!(c, "org"),
-            repo: Self::remove_extensions(&group!(c, "repo")),
-            ..Default::default()
-        }));
-
-        pattern!(SSH, |c: Captures| Ok(Self {
-            scheme: Scheme::Ssh,
-            user: Some(group!(c, "user")),
-            host: Host::from_str(group!(c, "host").as_str())?,
-            owner: group!(c, "org"),
-            repo: Self::remove_extensions(&group!(c, "repo")),
-            ..Default::default()
-        }));
-
-        bail!("The input did not match any pattern: {}", s)
+    fn from_pattern(s: &str, p: &Patterns, default_owner: Option<&str>) -> Result<Self> {
+        p.matches(s)
+            .and_then(|m| Self::from_match(m, default_owner))
+            .ok_or(anyhow!("The input did not match any pattern: {}", s))
     }
 
     fn remove_extensions(s: &str) -> String {
@@ -206,14 +371,6 @@ impl Url {
                 }
             })
             .into_inner()
-    }
-}
-
-impl FromStr for Url {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Self> {
-        Url::from_str(s, None)
     }
 }
 
@@ -262,7 +419,8 @@ mod tests {
                 user: None,
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                raw: Some("https://github.com/siketyan/siketyan.github.io.git".to_string()),
             },
             Url::from_url(&url).unwrap(),
         )
@@ -279,7 +437,8 @@ mod tests {
                 user: Some("git".to_string()),
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             },
             Url::from_url(&url).unwrap(),
         )
@@ -294,9 +453,11 @@ mod tests {
                 user: None,
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             },
-            Url::from_pattern("siketyan.github.io", Some("siketyan")).unwrap(),
+            Url::from_pattern("siketyan.github.io", &Patterns::default(), Some("siketyan"))
+                .unwrap(),
         )
     }
 
@@ -309,9 +470,10 @@ mod tests {
                 user: None,
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             },
-            Url::from_pattern("siketyan/siketyan.github.io", None).unwrap(),
+            Url::from_pattern("siketyan/siketyan.github.io", &Patterns::default(), None).unwrap(),
         )
     }
 
@@ -324,9 +486,15 @@ mod tests {
                 user: None,
                 host: Host::Unknown("gitlab.com".to_string()),
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             },
-            Url::from_pattern("gitlab.com:siketyan/siketyan.github.io", None).unwrap(),
+            Url::from_pattern(
+                "gitlab.com:siketyan/siketyan.github.io",
+                &Patterns::default(),
+                None
+            )
+            .unwrap(),
         )
     }
 
@@ -339,9 +507,46 @@ mod tests {
                 user: Some("git".to_string()),
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             },
-            Url::from_pattern("git@github.com:siketyan/siketyan.github.io.git", None).unwrap(),
+            Url::from_pattern(
+                "git@github.com:siketyan/siketyan.github.io.git",
+                &Patterns::default(),
+                None
+            )
+            .unwrap(),
+        )
+    }
+
+    #[test]
+    fn parse_from_custom_pattern() {
+        let patterns = Patterns::default().with(
+            Pattern::from(
+                Regex::new(r"^(?P<scheme>https)://(?P<host>git\.kernel\.org)/pub/scm/linux/kernel/git/(?P<owner>.+)/(?P<repo>.+)\.git").unwrap()
+            )
+                .with_scheme(Scheme::Https)
+        );
+
+        assert_eq!(
+            Url {
+                vcs: Vcs::Git,
+                scheme: Scheme::Https,
+                host: Host::Unknown("git.kernel.org".to_string()),
+                owner: "torvalds".to_string(),
+                repo: "linux".to_string(),
+                raw: Some(
+                    "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
+                        .to_string(),
+                ),
+                ..Default::default()
+            },
+            Url::from_pattern(
+                "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git",
+                &patterns,
+                None
+            )
+            .unwrap(),
         )
     }
 
@@ -355,7 +560,8 @@ mod tests {
                 user: None,
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             }
             .to_string()
             .as_str(),
@@ -372,7 +578,8 @@ mod tests {
                 user: Some("git".to_string()),
                 host: Host::GitHub,
                 owner: "siketyan".to_string(),
-                repo: "siketyan.github.io".to_string()
+                repo: "siketyan.github.io".to_string(),
+                ..Default::default()
             }
             .to_string()
             .as_str(),

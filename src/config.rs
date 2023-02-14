@@ -9,6 +9,7 @@ use crate::git::Config as GitConfig;
 use crate::profile::Profiles;
 use crate::root::Root;
 use crate::rule::Rules;
+use crate::url::Patterns;
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Defaults {
@@ -21,6 +22,8 @@ pub struct Config {
     pub defaults: Defaults,
     #[serde(default)]
     pub git: GitConfig,
+    #[serde(default)]
+    pub patterns: Patterns,
     #[serde(default)]
     pub profiles: Profiles,
     #[serde(default)]

@@ -34,7 +34,11 @@ impl Cmd {
             return Ok(());
         }
 
-        let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
+        let url = Url::from_str(
+            &self.repo,
+            &config.patterns,
+            config.defaults.owner.as_deref(),
+        )?;
         let path = PathBuf::from(Path::resolve(&root, &url));
 
         Spinner::new("Deleting the repository...")
