@@ -39,7 +39,7 @@ impl<'a> Path<'a> {
         match (host, owner) {
             (false, true) => format!("{}/{}", self.owner, self.repo),
             (true, false) => format!("{}:{}", self.host, self.repo),
-            (false, false) => format!("{}", self.repo),
+            (false, false) => self.repo.to_string(),
             _ => format!("{}:{}/{}", self.host, self.owner, self.repo),
         }
     }
