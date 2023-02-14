@@ -62,7 +62,7 @@ pub struct Pattern {
     host: Option<Host>,
     owner: Option<String>,
     url: Option<String>,
-    infer: bool,
+    infer: Option<bool>,
 }
 
 impl Pattern {
@@ -74,7 +74,7 @@ impl Pattern {
 
     #[inline]
     pub fn with_infer(mut self) -> Self {
-        self.infer = true;
+        self.infer = Some(true);
         self
     }
 
@@ -110,7 +110,7 @@ impl Pattern {
                 raw: None,
             };
 
-            m.raw = match self.infer {
+            m.raw = match self.infer.unwrap_or_default() {
                 true => None,
                 _ => self
                     .url
@@ -147,7 +147,7 @@ impl From<Regex> for Pattern {
             host: None,
             owner: None,
             url: None,
-            infer: false,
+            infer: None,
         }
     }
 }

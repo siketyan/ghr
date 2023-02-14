@@ -46,8 +46,22 @@ impl Config {
         P: AsRef<Path>,
     {
         Ok(match path.as_ref().exists() {
-            true => Some(toml::from_str(read_to_string(path)?.as_str())?),
+            true => Some(Self::load_from_str(read_to_string(path)?.as_str())?),
             _ => None,
         })
+    }
+
+    fn load_from_str(s: &str) -> Result<Self> {
+        Ok(toml::from_str(s)?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::config::Config;
+
+    #[test]
+    fn load_example_config() {
+        Config::load_from_str(include_str!("../config.example.toml")).unwrap();
     }
 }
