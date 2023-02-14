@@ -376,6 +376,10 @@ impl Url {
 
 impl ToString for Url {
     fn to_string(&self) -> String {
+        if let Some(r) = &self.raw {
+            return r.to_string();
+        }
+
         let authority = match &self.user {
             Some(u) => format!("{}@{}", u, self.host.to_string()),
             _ => self.host.to_string(),

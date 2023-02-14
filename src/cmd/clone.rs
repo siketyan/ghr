@@ -84,6 +84,8 @@ impl Cmd {
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
+        info!("Cloning from '{}'", url.to_string());
+
         config.git.strategy.clone.clone_repository(
             url,
             &path,
