@@ -300,10 +300,10 @@ pub struct Url {
 
 impl Url {
     pub fn from_str(s: &str, p: &Patterns, default_owner: Option<&str>) -> Result<Self> {
-        match s.contains("://") {
+        Self::from_pattern(s, p, default_owner).or_else(|e| match s.contains("://") {
             true => Self::from_url(&url::Url::from_str(s)?),
-            _ => Self::from_pattern(s, p, default_owner),
-        }
+            _ => Err(e),
+        })
     }
 
     fn from_url(url: &url::Url) -> Result<Self> {
