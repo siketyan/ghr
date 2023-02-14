@@ -9,6 +9,7 @@ use crate::git::Config as GitConfig;
 use crate::profile::Profiles;
 use crate::root::Root;
 use crate::rule::Rules;
+use crate::url::Patterns;
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Defaults {
@@ -21,6 +22,8 @@ pub struct Config {
     pub defaults: Defaults,
     #[serde(default)]
     pub git: GitConfig,
+    #[serde(default)]
+    pub patterns: Patterns,
     #[serde(default)]
     pub profiles: Profiles,
     #[serde(default)]
@@ -43,8 +46,27 @@ impl Config {
         P: AsRef<Path>,
     {
         Ok(match path.as_ref().exists() {
-            true => Some(toml::from_str(read_to_string(path)?.as_str())?),
+            true => Some(Self::load_from_str(read_to_string(path)?.as_str())?),
             _ => None,
         })
+    }
+
+    fn load_from_str(s: &str) -> Result<Self> {
+        Ok(toml::from_str::<Self>(s)?.with_defaults())
+    }
+
+    fn with_defaults(mut self) -> Self {
+        self.patterns = self.patterns.with_defaults();
+        self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::config::Config;
+
+    #[test]
+    fn load_example_config() {
+        Config::load_from_str(include_str!("../ghr.example.toml")).unwrap();
     }
 }

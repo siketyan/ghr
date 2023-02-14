@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 
+use anyhow::anyhow;
 use tracing::debug;
 
 use crate::git::{CloneOptions, CloneRepository};
@@ -21,8 +22,13 @@ impl CloneRepository for Cli {
             args.push("--recursive");
         }
 
-        let _ = Command::new("git").args(args).output()?;
-
-        Ok(())
+        let output = Command::new("git").args(args).output()?;
+        match output.status.success() {
+            true => Ok(()),
+            _ => Err(anyhow!(
+                "Error occurred while cloning the repository: {}",
+                String::from_utf8_lossy(output.stderr.as_slice()),
+            )),
+        }
     }
 }

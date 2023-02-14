@@ -1,0 +1,54 @@
+#
+# Example configuration for ghr.
+#
+
+[defaults]
+# Sets the default owner of repositories.
+# You can pass only repository name to 'ghr clone' when this is set.
+owner = "siketyan"
+
+[git]
+# Chooses the strategy to use on Git clones.
+# 'Cli' is the default. 'Git2' is also supported, but deprecated.
+strategy.clone = "Cli"
+
+[[patterns]]
+# You can use additional patterns to specify where the repository is cloned from.
+# For details of regular expression syntax, see https://docs.rs/regex/latest/regex/index.html .
+regex = "^(?P<scheme>https)://(?P<host>git\\.kernel\\.org)/pub/scm/linux/kernel/git/(?P<owner>.+)/(?P<repo>.+)\\.git"
+
+# You can override parameters if those are not in or different from the pattern.
+vcs = "git"
+scheme = "https"
+user = ""
+host = "git.kernel.org"
+owner = "torvalds"
+
+# Composes URL different from the input.
+# This does not work when inferring is enabled.
+url = "{{scheme}}://{{host}}/pub/scm/linux/kernel/git/{{owner}}/{{repo}}.{{vcs}}"
+
+# Turn off inferring URL to use the raw input to clone.
+infer = false
+
+[profiles.work]
+# Overrides Git profile using the profile.
+# You need to add rule(s) to attach this profile onto a repository.
+user.name = "My Working Name"
+user.email = "my_working.email@example.com"
+
+[applications.vscode]
+# You can open a repository in VS Code using `ghr open <repo> vscode`.
+cmd = "code"
+args = ["%p"]
+
+[[rules]]
+# 'work' profile declared above is attached on this rule.
+profile.name = "work"
+
+# This rule is applied when the repository is owned by your company on GitHub.
+host = "github.com"
+owner = "my-company-org"
+
+# Optionally you can apply the rule onto a specific repo.
+#repo = "company-repo"

@@ -77,12 +77,14 @@ impl Cmd {
     }
 
     fn clone(&self, root: &Root, config: &Config, repo: &str) -> Result<CloneResult> {
-        let url = Url::from_str(repo, config.defaults.owner.as_deref())?;
+        let url = Url::from_str(repo, &config.patterns, config.defaults.owner.as_deref())?;
         let path = PathBuf::from(Path::resolve(root, &url));
         let profile = config
             .rules
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
+
+        info!("Cloning from '{}'", url.to_string());
 
         config.git.strategy.clone.clone_repository(
             url,

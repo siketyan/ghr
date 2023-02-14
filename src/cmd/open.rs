@@ -22,7 +22,11 @@ impl Cmd {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
-        let url = Url::from_str(&self.repo, config.defaults.owner.as_deref())?;
+        let url = Url::from_str(
+            &self.repo,
+            &config.patterns,
+            config.defaults.owner.as_deref(),
+        )?;
         let path = PathBuf::from(Path::resolve(&root, &url));
 
         config

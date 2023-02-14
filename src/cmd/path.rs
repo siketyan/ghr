@@ -36,6 +36,7 @@ impl Cmd {
         let path = if let Some(repo) = self.repo.as_deref() {
             let url = Url::from_str(
                 repo,
+                &config.patterns,
                 self.owner.as_deref().or(config.defaults.owner.as_deref()),
             )?;
 
