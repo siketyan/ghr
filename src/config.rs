@@ -62,6 +62,6 @@ mod tests {
 
     #[test]
     fn load_example_config() {
-        Config::load_from_str(include_str!("../config.example.toml")).unwrap();
+        Config::load_from_str(include_str!("../ghr.example.toml")).unwrap();
     }
 }
