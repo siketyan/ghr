@@ -52,7 +52,12 @@ impl Config {
     }
 
     fn load_from_str(s: &str) -> Result<Self> {
-        Ok(toml::from_str(s)?)
+        Ok(toml::from_str::<Self>(s)?.with_defaults())
+    }
+
+    fn with_defaults(mut self) -> Self {
+        self.patterns = self.patterns.with_defaults();
+        self
     }
 }
 
