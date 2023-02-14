@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use git2::Repository;
-use tracing::debug;
+use tracing::{debug, warn};
 
 use crate::git::{CloneOptions, CloneRepository};
 
@@ -14,6 +14,7 @@ impl CloneRepository for Git2 {
         P: AsRef<Path>,
     {
         debug!("Cloning the repository using Git2 strategy");
+        warn!("Git2 strategy is deprecated and will be removed in v0.4.0. Switch to CLI strategy.");
 
         let _ = match options.recursive {
             true => Repository::clone_recurse(&url.to_string(), path)?,
