@@ -1,7 +1,6 @@
 mod cli;
-mod git2;
 
-pub use {self::git2::Git2, cli::Cli};
+pub use cli::Cli;
 
 use std::path::Path;
 
@@ -13,7 +12,6 @@ use crate::git::{CloneOptions, CloneRepository};
 pub enum Strategy {
     #[default]
     Cli,
-    Git2,
 }
 
 impl CloneRepository for Strategy {
@@ -24,7 +22,6 @@ impl CloneRepository for Strategy {
     {
         match self {
             Self::Cli => Cli.clone_repository(url, path, options),
-            Self::Git2 => Git2.clone_repository(url, path, options),
         }
     }
 }

@@ -9,7 +9,7 @@ owner = "siketyan"
 
 [git]
 # Chooses the strategy to use on Git clones.
-# 'Cli' is the default. 'Git2' is also supported, but deprecated.
+# 'Cli' is the default and only supported.
 strategy.clone = "Cli"
 
 [[patterns]]
