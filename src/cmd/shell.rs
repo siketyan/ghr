@@ -28,13 +28,23 @@ pub struct Cmd {
     /// Kind of the shell.
     #[clap(default_value_t)]
     kind: Kind,
+
+    /// Uses the shell completion
+    #[clap(long)]
+    completion: bool,
 }
 
 impl Cmd {
     pub fn run(self) -> Result<()> {
         let script = match self.kind {
-            Kind::Bash => include_str!("../../resources/shell/bash/ghr.bash"),
-            Kind::Fish => include_str!("../../resources/shell/fish/ghr.fish"),
+            Kind::Bash => match self.completion {
+                true => include_str!("../../resources/shell/bash/ghr.bash"),
+                _ => include_str!("../../resources/shell/bash/ghr-completion.bash"),
+            },
+            Kind::Fish => match self.completion {
+                true => include_str!("../../resources/shell/fish/ghr.fish"),
+                _ => include_str!("../../resources/shell/fish/ghr-completion.fish"),
+            },
         };
 
         print!("{}", script);
