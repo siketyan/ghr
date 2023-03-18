@@ -42,12 +42,24 @@ Add the line below to your shell configuration script to enable it.
 
 #### Bash
 ```shell
-eval "$(ghr shell bash)"
+ghr shell bash | source
+```
+
+To enable completions, add the line into `~/.bash_completion`.
+
+```shell
+ghr shell bash --completion | source
 ```
 
 #### Fish
 ```shell
-eval "$(ghr shell fish)"
+ghr shell fish | source
+```
+
+To enable completions, add the line into `~/.config/fish/completions/ghr.fish`.
+
+```shell
+ghr shell fish --completion | source
 ```
 
 ## 💚 Usages
