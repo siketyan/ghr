@@ -45,6 +45,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ea22880d78093b0cbe17c89f64a7d457941e65759157ec6cb31a31d652b05e5"
 
 [[package]]
+name = "base64"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a"
+
+[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -65,24 +71,24 @@ version = "0.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2915568baa77be2c38f1d7594d1d7ceecc1012ab1ffdf8ddc9d0210596ee23e"
 dependencies = [
- "build-info-common",
+ "build-info-common 0.0.29",
  "build-info-proc",
  "once_cell",
 ]
 
 [[package]]
 name = "build-info-build"
-version = "0.0.29"
+version = "0.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "562a39027834eae2be534ab5079440cfaa4ce9ca769646e72b1c734236205f16"
+checksum = "a81141b1af6bc87316a3fdcc3b33658f7a9153c7677da6b0e57d762c87f8ee61"
 dependencies = [
  "anyhow",
- "base64 0.20.0",
+ "base64 0.21.0",
  "bincode",
- "build-info-common",
+ "build-info-common 0.0.30",
  "cargo_metadata",
  "chrono",
- "git2 0.15.0",
+ "git2",
  "glob",
  "once_cell",
  "pretty_assertions",
@@ -104,6 +110,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "build-info-common"
+version = "0.0.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0209923629b6854e590663db44001ea7cf35b3c7c13b04428c227f42bfda0489"
+dependencies = [
+ "chrono",
+ "derive_more",
+ "semver",
+ "serde",
+]
+
+[[package]]
 name = "build-info-proc"
 version = "0.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -112,7 +130,7 @@ dependencies = [
  "anyhow",
  "base64 0.20.0",
  "bincode",
- "build-info-common",
+ "build-info-common 0.0.29",
  "chrono",
  "num-bigint",
  "num-traits",
@@ -481,7 +499,7 @@ dependencies = [
  "console",
  "dialoguer",
  "dirs",
- "git2 0.16.1",
+ "git2",
  "indicatif",
  "itertools",
  "lazy_static",
@@ -495,19 +513,6 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "walkdir",
-]
-
-[[package]]
-name = "git2"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2994bee4a3a6a51eb90c218523be382fd7ea09b16380b9312e9dbe955ff7c7d1"
-dependencies = [
- "bitflags",
- "libc",
- "libgit2-sys",
- "log",
- "url",
 ]
 
 [[package]]
