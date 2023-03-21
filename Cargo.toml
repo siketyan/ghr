@@ -35,7 +35,7 @@ url = "2.3"
 walkdir = "2.3"
 
 [build-dependencies]
-build-info-build = "0.0.29"
+build-info-build = "0.0.30"
 
 [features]
 default = []
