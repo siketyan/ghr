@@ -12,6 +12,16 @@ owner = "siketyan"
 # 'Cli' is the default and only supported.
 strategy.clone = "Cli"
 
+[platforms.github]
+# Default configuration for GitHub.com.
+type = "github"
+
+[platforms.ghe-acme]
+# If you are using a GitHub Enterprise Server instance,
+# Specify here to enable `--fork` working with repositories on the GHE server.
+type = "github"
+host = "ghe.example.com"
+
 [[patterns]]
 # You can use additional patterns to specify where the repository is cloned from.
 # For details of regular expression syntax, see https://docs.rs/regex/latest/regex/index.html .

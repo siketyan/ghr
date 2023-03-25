@@ -6,6 +6,7 @@ use serde::Deserialize;
 
 use crate::application::Applications;
 use crate::git::Config as GitConfig;
+use crate::platform::Config as PlatformConfig;
 use crate::profile::Profiles;
 use crate::root::Root;
 use crate::rule::Rules;
@@ -22,6 +23,8 @@ pub struct Config {
     pub defaults: Defaults,
     #[serde(default)]
     pub git: GitConfig,
+    #[serde(default)]
+    pub platforms: PlatformConfig,
     #[serde(default)]
     pub patterns: Patterns,
     #[serde(default)]

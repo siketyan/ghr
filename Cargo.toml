@@ -14,6 +14,8 @@ authors = [
 
 [dependencies]
 anyhow = "1.0"
+async-hofs = "0.1.1"
+async-trait = "0.1.67"
 build-info = "0.0.30"
 clap = { version = "4.1", features = ["derive"] }
 console = "0.15.2"
@@ -28,15 +30,20 @@ serde = { version = "1.0", features = ["derive"] }
 serde_regex = "1.1"
 serde_with = "2.3"
 tokio = { version = "1.26", features = ["macros", "rt-multi-thread"] }
+tokio-stream = "0.1.12"
 toml = "0.7.2"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 url = "2.3"
 walkdir = "2.3"
 
+gh-config = { version = "0.2.1", optional = true }
+octocrab = { version = "0.18.1", optional = true }
+
 [build-dependencies]
 build-info-build = "0.0.30"
 
 [features]
-default = []
+default = ["github"]
 vendored = ["git2/vendored-libgit2", "git2/vendored-openssl"]
+github = ["gh-config", "octocrab"]

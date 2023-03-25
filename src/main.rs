@@ -4,6 +4,7 @@ mod config;
 mod console;
 mod git;
 mod path;
+mod platform;
 mod profile;
 mod repository;
 mod root;
