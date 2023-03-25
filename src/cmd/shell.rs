@@ -38,12 +38,12 @@ impl Cmd {
     pub fn run(self) -> Result<()> {
         let script = match self.kind {
             Kind::Bash => match self.completion {
-                true => include_str!("../../resources/shell/bash/ghr.bash"),
-                _ => include_str!("../../resources/shell/bash/ghr-completion.bash"),
+                true => include_str!("../../resources/shell/bash/ghr-completion.bash"),
+                _ => include_str!("../../resources/shell/bash/ghr.bash"),
             },
             Kind::Fish => match self.completion {
-                true => include_str!("../../resources/shell/fish/ghr.fish"),
-                _ => include_str!("../../resources/shell/fish/ghr-completion.fish"),
+                true => include_str!("../../resources/shell/fish/ghr-completion.fish"),
+                _ => include_str!("../../resources/shell/fish/ghr.fish"),
             },
         };
 
