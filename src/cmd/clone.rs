@@ -53,7 +53,10 @@ impl Cmd {
         let repo: Vec<CloneResult> = Spinner::new("Cloning the repository...")
             .spin_while(|| async move {
                 urls.into_iter()
-                    .map(|url| self.clone(&root, &config, url))
+                    .map(|url| {
+                        info!("Cloning from '{}'", url.to_string());
+                        self.clone(&root, &config, url)
+                    })
                     .try_collect()
             })
             .await?;
