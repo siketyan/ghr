@@ -40,6 +40,26 @@ impl Application {
     }
 }
 
+#[cfg(windows)]
+impl Default for Application {
+    fn default() -> Self {
+        Self {
+            cmd: "explorer.exe".to_string(),
+            args: vec!["%p".to_string()],
+        }
+    }
+}
+
+#[cfg(not(windows))]
+impl Default for Application {
+    fn default() -> Self {
+        Self {
+            cmd: "open".to_string(),
+            args: vec!["%p".to_string()],
+        }
+    }
+}
+
 #[derive(Debug, Default, Deserialize)]
 pub struct Applications {
     #[serde(flatten)]
@@ -60,6 +80,16 @@ impl Applications {
     {
         self.open(name, &path)
             .unwrap_or_else(|| Application::intermediate(name).open(&path))
+    }
+
+    pub fn open_or_intermediate_or_default<P>(&self, name: Option<&str>, path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        match name {
+            Some(n) => self.open_or_intermediate(n, path),
+            _ => Application::default().open(path),
+        }
     }
 }
 
