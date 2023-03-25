@@ -7,15 +7,20 @@ use serde::Deserialize;
 use crate::platform::{Fork, Platform, PlatformInit};
 use crate::url::Url;
 
+fn default_host() -> String {
+    GITHUB_COM.to_string()
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Config {
+    #[serde(default = "default_host")]
     pub(super) host: String,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            host: GITHUB_COM.to_string(),
+            host: default_host(),
         }
     }
 }
