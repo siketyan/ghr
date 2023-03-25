@@ -38,8 +38,13 @@ impl PlatformInit for GitHub {
             .oauth_token
             .clone();
 
+        let mut builder = Octocrab::builder().personal_token(token);
+        if config.host != GITHUB_COM {
+            builder = builder.base_url(format!("https://{}/api/v3", &config.host))?;
+        }
+
         Ok(Self {
-            client: Octocrab::builder().personal_token(token).build()?,
+            client: builder.build()?,
         })
     }
 }
