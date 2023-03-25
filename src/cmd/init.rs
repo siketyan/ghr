@@ -23,7 +23,7 @@ pub struct Cmd {
 
     /// Opens the directory after cloned a repository.
     #[clap(long)]
-    open: Option<String>,
+    open: Option<Option<String>>,
 }
 
 impl Cmd {
@@ -68,11 +68,13 @@ impl Cmd {
         }
 
         if let Some(app) = self.open {
-            config.applications.open_or_intermediate(&app, &path)?;
+            config
+                .applications
+                .open_or_intermediate_or_default(app.as_deref(), &path)?;
 
             info!(
                 "Opened the repository in [{}] successfully.",
-                style(&app).bold(),
+                style(app.as_deref().unwrap_or("<default>")).bold(),
             );
         }
 

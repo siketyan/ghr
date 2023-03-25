@@ -14,7 +14,7 @@ pub struct Cmd {
     repo: String,
 
     /// Name of the application entry.
-    application: String,
+    application: Option<String>,
 }
 
 impl Cmd {
@@ -31,7 +31,7 @@ impl Cmd {
 
         config
             .applications
-            .open_or_intermediate(&self.application, path)?;
+            .open_or_intermediate_or_default(self.application.as_deref(), path)?;
 
         Ok(())
     }
