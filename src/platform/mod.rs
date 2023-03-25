@@ -26,6 +26,7 @@ pub trait Platform: Fork {}
 #[serde(tag = "type")]
 pub enum PlatformConfig {
     #[cfg(feature = "github")]
+    #[serde(rename = "github")]
     GitHub(github::Config),
 }
 
@@ -55,6 +56,7 @@ impl TryInto<Box<dyn Platform>> for &PlatformConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
+    #[serde(flatten)]
     map: HashMap<String, PlatformConfig>,
 }
 
