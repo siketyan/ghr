@@ -27,7 +27,7 @@ impl CloneRepository for Cli {
             true => Ok(()),
             _ => Err(anyhow!(
                 "Error occurred while cloning the repository: {}",
-                String::from_utf8_lossy(output.stderr.as_slice()),
+                String::from_utf8_lossy(output.stderr.as_slice()).trim(),
             )),
         }
     }
