@@ -38,7 +38,7 @@ url = "2.3"
 walkdir = "2.3"
 
 gh-config = { version = "0.2.1", optional = true }
-octocrab = { version = "0.18.1", optional = true }
+octocrab = { version = "0.19.0", optional = true }
 
 [build-dependencies]
 build-info-build = "0.0.30"
