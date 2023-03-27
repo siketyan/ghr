@@ -15,7 +15,7 @@ authors = [
 [dependencies]
 anyhow = "1.0"
 async-hofs = "0.1.1"
-async-trait = "0.1.67"
+async-trait = "0.1.68"
 build-info = "0.0.30"
 clap = { version = "4.1", features = ["derive"] }
 console = "0.15.2"
