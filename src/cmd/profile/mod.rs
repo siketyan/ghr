@@ -1,5 +1,6 @@
 mod list;
 mod show;
+mod apply;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -10,6 +11,8 @@ pub enum Action {
     List(list::Cmd),
     /// Shows a profile in TOML format.
     Show(show::Cmd),
+    /// Apply a profile.
+    Apply(apply::Cmd),
 }
 
 #[derive(Debug, Parser)]
@@ -24,6 +27,7 @@ impl Cmd {
         match self.action {
             List(cmd) => cmd.run(),
             Show(cmd) => cmd.run(),
+            Apply(cmd) => cmd.run(),
         }
     }
 }
