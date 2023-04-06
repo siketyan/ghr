@@ -67,7 +67,7 @@ ghr shell fish --completion | source
 Usage: ghr <COMMAND>
 
 Commands:
-  cd       Changes directory into a repository (Shell extension required)
+  cd       Change directory to one of the managed repositories (Shell extension required)
   clone    Clones a Git repository to local
   delete   Deletes a repository from local
   init     Initialises a Git repository in local
@@ -94,7 +94,7 @@ ghr clone ssh://git@github.com/<owner>/<repo>.git
 ghr clone git@github.com:<owner>/<repo>.git
 ```
 
-If you have installed the shell extension, you can change directory into the cloned repository:
+If you have installed the shell extension, you can change directory to the cloned repository:
 
 ```shell
 ghr clone <url_or_pattern> --cd
@@ -112,7 +112,7 @@ ghr clone <repo>
 ```
 
 ### Changing directory
-You can change directory into a repository on the shell.
+You can change directory to one of the managed repositories on the shell.
 It requires installing the shell extension.
 
 ```shell

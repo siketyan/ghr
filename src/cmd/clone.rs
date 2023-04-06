@@ -29,11 +29,11 @@ pub struct Cmd {
     #[clap(short, long)]
     recursive: bool,
 
-    /// Change directory after cloned a repository (Shell extension required).
+    /// Change directory after cloning the repository (Shell extension required).
     #[clap(long)]
     cd: bool,
 
-    /// Opens the directory after cloned a repository.
+    /// Opens the directory after cloning the repository.
     #[clap(long)]
     open: Option<Option<String>>,
 }
