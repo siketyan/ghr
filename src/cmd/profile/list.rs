@@ -20,7 +20,6 @@ impl Cmd {
                 style(name).bold(),
                 profile
                     .configs
-                    .0
                     .get("user.name")
                     .map(|name| name.as_str())
                     .unwrap_or(INHERIT),
@@ -28,7 +27,6 @@ impl Cmd {
                     "<{}>",
                     profile
                         .configs
-                        .0
                         .get("user.email")
                         .map(|email| email.as_str())
                         .unwrap_or(INHERIT),

@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Result};
 use clap::Parser;
+use itertools::Itertools;
 
 use crate::config::Config;
 
@@ -17,13 +18,13 @@ impl Cmd {
             .get(&self.name)
             .ok_or_else(|| anyhow!("Unknown profile: {}", &self.name))?;
 
-        let mut profile_keys: Vec<_> = profile.configs.0.keys().collect();
-
-        profile_keys.sort();
-
-        for key in profile_keys {
-            println!(r#"{} = "{}""#, key, profile.configs.0[key.as_str()])
-        }
+        profile
+            .configs
+            .iter()
+            .sorted_by_key(|(k, _)| k.to_string())
+            .for_each(|(k, v)| {
+                println!(r#"{} = "{}""#, k, v);
+            });
 
         Ok(())
     }
