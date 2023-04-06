@@ -42,7 +42,7 @@ impl Cmd {
         let path = PathBuf::from(Path::resolve(&root, &url));
 
         Spinner::new("Deleting the repository...")
-            .spin_while(|| ready(std::fs::remove_dir_all(&path).map_err(anyhow::Error::from)))
+            .spin_while(|_| ready(std::fs::remove_dir_all(&path).map_err(anyhow::Error::from)))
             .await?;
 
         info!(

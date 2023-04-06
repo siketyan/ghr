@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 use std::future::Future;
-use std::sync::mpsc::{channel, SendError};
+use std::sync::mpsc::{channel, SendError, Sender};
 use std::time::Duration;
 
 use console::style;
@@ -18,6 +18,12 @@ fn create_spinner(message: impl Into<Cow<'static, str>>) -> ProgressBar {
         .with_message(message)
 }
 
+#[derive(Debug)]
+pub enum Message {
+    UpdateText(String),
+    Finish,
+}
+
 pub struct Spinner {
     inner: ProgressBar,
 }
@@ -31,23 +37,29 @@ impl Spinner {
 
     pub async fn spin_while<F, Fut, T, E>(self, f: F) -> Result<T, E>
     where
-        F: FnOnce() -> Fut,
+        F: FnOnce(Sender<Message>) -> Fut,
         Fut: Future<Output = Result<T, E>>,
-        E: From<SendError<()>> + From<JoinError>,
+        E: From<SendError<Message>> + From<JoinError>,
     {
         let (tx, rx) = channel();
         let progress = tokio::spawn(async move {
             let p = self.inner;
-            while rx.recv_timeout(Duration::from_millis(100)).is_err() {
-                p.tick();
+            match rx.recv_timeout(Duration::from_millis(100)) {
+                Ok(Message::UpdateText(message)) => p.set_message(message),
+                Ok(Message::Finish) => {
+                    p.finish_and_clear();
+
+                    return;
+                }
+                Err(_) => (),
             }
 
-            p.finish_and_clear();
+            p.tick();
         });
 
-        let res = f().await;
+        let res = f(tx.clone()).await;
 
-        tx.send(())?;
+        tx.send(Message::Finish)?;
         progress.await?;
 
         res

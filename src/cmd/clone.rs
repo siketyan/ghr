@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::sync::mpsc::Sender;
 
 use anyhow::Result;
 use clap::Parser;
@@ -8,11 +9,23 @@ use itertools::Itertools;
 use tracing::info;
 
 use crate::config::Config;
-use crate::console::Spinner;
-use crate::git::{CloneOptions, CloneRepository};
+use crate::console::{Message, Spinner};
+use crate::git::{CloneOptions, CloneRepository, CloneStatus};
 use crate::path::Path;
 use crate::root::Root;
 use crate::url::Url;
+
+struct ProgressBarStatus {
+    tx: Sender<Message>,
+}
+
+impl CloneStatus for &ProgressBarStatus {
+    fn set_clone_status(&mut self, message: &str) {
+        self.tx
+            .send(Message::UpdateText(message.to_string()))
+            .unwrap();
+    }
+}
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
@@ -38,10 +51,11 @@ impl Cmd {
         let config = Config::load_from(&root)?;
 
         let repo: Vec<CloneResult> = Spinner::new("Cloning the repository...")
-            .spin_while(|| async move {
+            .spin_while(|tx| async move {
+                let status = ProgressBarStatus { tx };
                 self.repo
                     .iter()
-                    .map(|repo| self.clone(&root, &config, repo))
+                    .map(|repo| self.clone(&root, &config, repo, &status))
                     .try_collect()
             })
             .await?;
@@ -76,7 +90,13 @@ impl Cmd {
         Ok(())
     }
 
-    fn clone(&self, root: &Root, config: &Config, repo: &str) -> Result<CloneResult> {
+    fn clone(
+        &self,
+        root: &Root,
+        config: &Config,
+        repo: &str,
+        status: &ProgressBarStatus,
+    ) -> Result<CloneResult> {
         let url = Url::from_str(repo, &config.patterns, config.defaults.owner.as_deref())?;
         let path = PathBuf::from(Path::resolve(root, &url));
         let profile = config
@@ -89,6 +109,7 @@ impl Cmd {
         config.git.strategy.clone.clone_repository(
             url,
             &path,
+            status,
             &CloneOptions {
                 recursive: self.recursive,
             },
