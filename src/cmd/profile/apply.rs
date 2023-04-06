@@ -1,12 +1,14 @@
 use anyhow::{anyhow, Result};
 use clap::Parser;
-use itertools::Itertools;
+use console::style;
+use git2::Repository;
+use tracing::info;
 
 use crate::config::Config;
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
-    // Name of the profile to show.
+    // Name of the profile to apply.
     name: String,
 }
 
@@ -18,13 +20,13 @@ impl Cmd {
             .get(&self.name)
             .ok_or_else(|| anyhow!("Unknown profile: {}", &self.name))?;
 
-        profile
-            .configs
-            .iter()
-            .sorted_by_key(|(k, _)| k.to_string())
-            .for_each(|(k, v)| {
-                println!(r#"{} = "{}""#, k, v);
-            });
+        let repo = Repository::open_from_env()?;
+
+        profile.apply(&mut repo.config()?)?;
+        info!(
+            "Attached profile [{}] successfully.",
+            style(self.name).bold()
+        );
 
         Ok(())
     }
