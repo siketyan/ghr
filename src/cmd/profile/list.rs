@@ -19,16 +19,14 @@ impl Cmd {
                 style("OK").cyan(),
                 style(name).bold(),
                 profile
-                    .user
-                    .as_ref()
-                    .and_then(|u| u.name.as_deref())
+                    .configs.0.get("user.name")
+                    .map(|name| name.as_str())
                     .unwrap_or(INHERIT),
                 style(&format!(
                     "<{}>",
                     profile
-                        .user
-                        .as_ref()
-                        .and_then(|u| u.email.as_deref())
+                        .configs.0.get("user.email")
+                        .map(|email| email.as_str())
                         .unwrap_or(INHERIT),
                 ))
                 .dim(),

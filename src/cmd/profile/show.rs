@@ -17,7 +17,13 @@ impl Cmd {
             .get(&self.name)
             .ok_or_else(|| anyhow!("Unknown profile: {}", &self.name))?;
 
-        print!("{}", toml::to_string(profile)?);
+        let mut profile_keys: Vec<_> = profile.configs.0.keys().collect();
+
+        profile_keys.sort();
+
+        for key in profile_keys {
+            println!(r#"{} = "{}""#, key, profile.configs.0[key.as_str()])
+        }
 
         Ok(())
     }
