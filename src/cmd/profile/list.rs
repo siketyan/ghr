@@ -19,13 +19,17 @@ impl Cmd {
                 style("OK").cyan(),
                 style(name).bold(),
                 profile
-                    .configs.0.get("user.name")
+                    .configs
+                    .0
+                    .get("user.name")
                     .map(|name| name.as_str())
                     .unwrap_or(INHERIT),
                 style(&format!(
                     "<{}>",
                     profile
-                        .configs.0.get("user.email")
+                        .configs
+                        .0
+                        .get("user.email")
                         .map(|email| email.as_str())
                         .unwrap_or(INHERIT),
                 ))

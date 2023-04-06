@@ -23,7 +23,10 @@ impl Cmd {
         let repo = Repository::open_from_env()?;
 
         profile.apply(&mut repo.config()?)?;
-        info!("Attached profile [{}] successfully.", style(self.name).bold());
+        info!(
+            "Attached profile [{}] successfully.",
+            style(self.name).bold()
+        );
 
         Ok(())
     }
