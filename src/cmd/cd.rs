@@ -3,7 +3,7 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
-    /// URL or pattern of the repository to change directory into.
+    /// URL or pattern of the repository where to change directory to.
     repo: String,
 }
 

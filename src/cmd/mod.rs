@@ -14,7 +14,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]
 pub enum Action {
-    /// Changes directory into a repository (Shell extension required).
+    /// Change directory to one of the managed repositories (Shell extension required).
     Cd(cd::Cmd),
     /// Clones a Git repository to local.
     Clone(clone::Cmd),
