@@ -21,6 +21,19 @@ __ghr_complete__repos() {
   echo "$suggestions"
 }
 
+__ghr_complete__profiles() {
+  local profiles suggestions
+
+  profiles="$(ghr profile list --short)"
+  suggestions="$(compgen -W "${profiles}" -- "$1")"
+
+  if [[ $1 != -* && ${COMP_CWORD} -ne 3 ]]; then
+    return
+  fi
+
+  echo "$suggestions"
+}
+
 __ghr_complete() {
   local cword
 
@@ -48,13 +61,23 @@ __ghr_complete() {
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
   open)
-    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    COMPREPLY=($(__ghr_complete__repos "${cword}" --help))
     ;;
   path)
     COMPREPLY=($(__ghr_complete__repos "${cword}"))
     ;;
   profile)
-    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    if [ "$COMP_CWORD" = 2 ]; then
+      COMPREPLY=($(__ghr_complete__static "${cword}" --help list show apply))
+    else
+      case "${COMP_WORDS[2]}" in
+      show|apply)
+        COMPREPLY=($(__ghr_complete__profiles "${cword}" --help))
+        ;;
+      *)
+        ;;
+      esac
+    fi
     ;;
   shell)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
