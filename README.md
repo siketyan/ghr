@@ -42,13 +42,13 @@ Add the line below to your shell configuration script to enable it.
 
 #### Bash
 ```shell
-ghr shell bash | source
+source <(ghr shell bash)
 ```
 
 To enable completions, add the line into `~/.bash_completion`.
 
 ```shell
-ghr shell bash --completion | source
+source <(ghr shell bash --completion)
 ```
 
 #### Fish
