@@ -12,7 +12,7 @@ __ghr_complete__repos() {
   local repositories suggestions
 
   repositories="$(ghr list)"
-  suggestions="$(compgen -W "${repositories}" -- "$1")"
+  suggestions="$(compgen -W "${repositories[*]}" -- "$1")"
 
   if [[ $1 != -* && ${COMP_CWORD} -ne 2 ]]; then
     return
@@ -25,7 +25,7 @@ __ghr_complete__profiles() {
   local profiles suggestions
 
   profiles="$(ghr profile list --short)"
-  suggestions="$(compgen -W "${profiles}" -- "$1")"
+  suggestions="$(compgen -W "${profiles[*]}" -- "$1")"
 
   if [[ $1 != -* && ${COMP_CWORD} -ne 3 ]]; then
     return
@@ -43,7 +43,7 @@ __ghr_complete() {
   cword="${COMP_WORDS[COMP_CWORD]}"
 
   if [ "${COMP_CWORD}" = 1 ]; then
-    COMPREPLY=($(__ghr_complete__static "${cword}" --help cd clone delete help init open path profile shell version))
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help cd clone delete help init open browse path profile shell version))
     return 0
   fi
 
@@ -67,6 +67,9 @@ __ghr_complete() {
       # Complete a known command to open the repository using
       COMPREPLY=($(compgen -c -- "${cword}"))
     fi
+    ;;
+  browse)
+    COMPREPLY=($(__ghr_complete__repos "${cword}"))
     ;;
   path)
     COMPREPLY=($(__ghr_complete__repos "${cword}"))

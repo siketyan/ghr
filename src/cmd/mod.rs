@@ -1,3 +1,4 @@
+mod browse;
 mod cd;
 mod clone;
 mod delete;
@@ -26,6 +27,8 @@ pub enum Action {
     List(list::Cmd),
     /// Opens a repository in an application.
     Open(open::Cmd),
+    /// Browse a repository on web.
+    Browse(browse::Cmd),
     /// Prints the path to root, owner, or a repository.
     Path(path::Cmd),
     /// Manages profiles to use in repositories.
@@ -52,6 +55,7 @@ impl Cli {
             Init(cmd) => cmd.run(),
             List(cmd) => cmd.run(),
             Open(cmd) => cmd.run(),
+            Browse(cmd) => cmd.run(),
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),

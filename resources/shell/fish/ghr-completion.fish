@@ -12,13 +12,14 @@ complete -c ghr -n "__fish_is_arg_n 1" -a delete -d "Deletes a repository from l
 complete -c ghr -n "__fish_is_arg_n 1" -a init -d "Initialises a Git repository in local"
 complete -c ghr -n "__fish_is_arg_n 1" -a list -d "Lists all managed repositories"
 complete -c ghr -n "__fish_is_arg_n 1" -a open -d "Opens a repository in an application"
+complete -c ghr -n "__fish_is_arg_n 1" -a browse -d "Browse a repository on web"
 complete -c ghr -n "__fish_is_arg_n 1" -a path -d "Prints the path to root, owner, or a repository"
 complete -c ghr -n "__fish_is_arg_n 1" -a profile -d "Manages profiles to use in repositories"
 complete -c ghr -n "__fish_is_arg_n 1" -a shell -d "Writes a shell script to extend ghr features"
 complete -c ghr -n "__fish_is_arg_n 1" -a version -d "Prints the version of this application"
 
-# Complete the 2nd argument of cd, path, and open commands using the repository list
-complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from cd path open" -a "(ghr list)"
+# Complete the 2nd argument of cd, path, open and browse commands using the repository list
+complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from cd path open browse" -a "(ghr list)"
 
 # Complete the 3rd argument of open command using the known command list
 complete -c ghr -n "__fish_is_arg_n 3; and __fish_seen_subcommand_from open" -a "(complete -C '')"

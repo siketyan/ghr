@@ -73,6 +73,7 @@ Commands:
   init     Initialises a Git repository in local
   list     Lists all managed repositories
   open     Opens a repository in an application
+  browse   Browse a repository on web
   path     Prints the path to root, owner, or a repository
   profile  Manages profiles to use in repositories
   shell    Writes a shell script to extend ghr features
