@@ -61,9 +61,9 @@ __ghr_complete() {
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
   open)
-    if [ "$COMP_CWORD" = 2 ]; then
+    if [ "${COMP_CWORD}" = 2 ]; then
       COMPREPLY=($(__ghr_complete__repos "${cword}" --help))
-    elif [ "$COMP_CWORD" = 3 ]; then
+    elif [ "${COMP_CWORD}" = 3 ]; then
       COMPREPLY=($(compgen -c -- "${cword}"))
     fi
     ;;
