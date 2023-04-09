@@ -5,7 +5,7 @@ use octocrab::Octocrab;
 use serde::Deserialize;
 
 use crate::platform::{Browse, Fork, Platform, PlatformInit};
-use crate::url::{Patterns, Url};
+use crate::url::{Scheme, Url};
 
 fn default_host() -> String {
     GITHUB_COM.to_string()
@@ -78,15 +78,16 @@ impl Fork for GitHub {
 #[async_trait]
 impl Browse for GitHub {
     async fn get_browsable_url(&self, url: &Url) -> Result<Url> {
-        let url = self
-            .client
-            .repos(&url.owner, &url.repo)
-            .get()
-            .await?
-            .html_url
-            // use ok_or_else because a GitHub repository should return a html url
-            .ok_or_else(|| anyhow!("GitHub API did not return HTML URL for the repository."))?
-            .to_string();
-        Ok(Url::from_str(url.as_str(), &Patterns::new(), None)?)
+        let url = Url {
+            scheme: Scheme::Https,
+            raw: Some(format!(
+                "https://{}/{}/{}",
+                url.host.to_string(),
+                url.owner,
+                url.repo
+            )),
+            ..url.clone()
+        };
+        Ok(url)
     }
 }
