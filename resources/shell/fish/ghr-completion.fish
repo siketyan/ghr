@@ -17,9 +17,11 @@ complete -c ghr -n "__fish_is_arg_n 1" -a version -d "Prints the version of this
 
 complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from cd path open" -a "(ghr list)"
 
+complete -c ghr -n "__fish_is_arg_n 3; and __fish_seen_subcommand_from open" -a "(complete -C '')"
+
 #profile subcommands
 complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from profile" -a list -d "Lists all configured profiles"
 complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from profile" -a show -d "Shows a profile in TOML format"
 complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from profile" -a apply -d "Apply a profile"
 
-complete -c ghr -n "__fish_is_arg_n 3; and __fish_seen_subcommand_from profile; and __fish_seen_subcommand_from show apply" -a "(ghr profile list --short)"
+complete -c ghr -n "__fish_is_arg_n 3; and __fish_seen_subcommand_from profile; and __fish_seen_subcommand_from show apply" -a "(ghr profile list | sed -E 's/.+ - (.+): (.+)/\1\t\2/')"
