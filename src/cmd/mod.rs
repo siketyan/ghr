@@ -55,7 +55,7 @@ impl Cli {
             Init(cmd) => cmd.run(),
             List(cmd) => cmd.run(),
             Open(cmd) => cmd.run(),
-            Browse(cmd) => cmd.run(),
+            Browse(cmd) => cmd.run().await,
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),

@@ -1,9 +1,9 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::Parser;
 
 use crate::config::Config;
 use crate::root::Root;
-use crate::url::{Scheme, Url};
+use crate::url::Url;
 
 #[cfg(windows)]
 fn open_url(url: &Url) -> Result<()> {
@@ -55,16 +55,23 @@ pub struct Cmd {
 }
 
 impl Cmd {
-    pub fn run(self) -> Result<()> {
+    pub async fn run(self) -> Result<()> {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
-        let mut url = Url::from_str(
+        let url = Url::from_str(
             &self.repo,
             &config.patterns,
             config.defaults.owner.as_deref(),
         )?;
-        url.scheme = Scheme::Https;
+
+        let platform = config
+            .platforms
+            .find(&url)
+            .ok_or_else(|| anyhow!("Could not find a platform to browse."))?
+            .try_into_platform()?;
+
+        let url = platform.get_browsable_url(&url).await?;
 
         open_url(&url)?;
         Ok(())

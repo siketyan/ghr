@@ -14,13 +14,18 @@ pub trait Fork {
     async fn fork(&self, url: &Url, owner: Option<String>) -> Result<String>;
 }
 
+#[async_trait]
+pub trait Browse {
+    async fn get_browsable_url(&self, url: &Url) -> Result<Url>;
+}
+
 pub trait PlatformInit: Sized {
     type Config;
 
     fn init(config: &Self::Config) -> Result<Self>;
 }
 
-pub trait Platform: Fork {}
+pub trait Platform: Fork + Browse {}
 
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type")]
