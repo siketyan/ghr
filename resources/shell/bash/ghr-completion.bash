@@ -64,6 +64,7 @@ __ghr_complete() {
     if [ "${COMP_CWORD}" = 2 ]; then
       COMPREPLY=($(__ghr_complete__repos "${cword}" --help))
     elif [ "${COMP_CWORD}" = 3 ]; then
+      # Complete a known command to open the repository using
       COMPREPLY=($(compgen -c -- "${cword}"))
     fi
     ;;
