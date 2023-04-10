@@ -68,7 +68,7 @@ impl Cmd {
         let platform = config
             .platforms
             .find(&url)
-            .ok_or_else(|| anyhow!("Could not find a platform to browse."))?
+            .ok_or_else(|| anyhow!("Could not find a platform to browse on."))?
             .try_into_platform()?;
 
         let url = platform.get_browsable_url(&url).await?;
