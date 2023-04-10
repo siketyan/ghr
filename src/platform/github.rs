@@ -77,17 +77,12 @@ impl Fork for GitHub {
 
 #[async_trait]
 impl Browse for GitHub {
-    async fn get_browsable_url(&self, url: &Url) -> Result<Url> {
-        let url = Url {
-            scheme: Scheme::Https,
-            raw: Some(format!(
-                "https://{}/{}/{}",
-                url.host.to_string(),
-                url.owner,
-                url.repo
-            )),
-            ..url.clone()
-        };
-        Ok(url)
+    async fn get_browsable_url(&self, url: &Url) -> Result<url::Url> {
+        Ok(url::Url::parse(&format!(
+            "https://{}/{}/{}",
+            url.host.to_string(),
+            url.owner,
+            url.repo
+        ))?)
     }
 }

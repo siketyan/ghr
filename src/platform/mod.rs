@@ -16,7 +16,7 @@ pub trait Fork {
 
 #[async_trait]
 pub trait Browse {
-    async fn get_browsable_url(&self, url: &Url) -> Result<Url>;
+    async fn get_browsable_url(&self, url: &Url) -> Result<url::Url>;
 }
 
 pub trait PlatformInit: Sized {

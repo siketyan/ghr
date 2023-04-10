@@ -6,7 +6,7 @@ use crate::root::Root;
 use crate::url::Url;
 
 #[cfg(windows)]
-fn open_url(url: &Url) -> Result<()> {
+fn open_url(url: &url::Url) -> Result<()> {
     use std::ffi::CString;
 
     use windows::core::PCSTR;
@@ -31,7 +31,7 @@ fn open_url(url: &Url) -> Result<()> {
 }
 
 #[cfg(target_os = "macos")]
-fn open_url(url: &Url) -> Result<()> {
+fn open_url(url: &url::Url) -> Result<()> {
     std::process::Command::new("open")
         .arg(url.to_string())
         .spawn()?;
@@ -40,7 +40,7 @@ fn open_url(url: &Url) -> Result<()> {
 }
 
 #[cfg(all(not(windows), not(target_os = "macos")))]
-fn open_url(url: &Url) -> Result<()> {
+fn open_url(url: &url::Url) -> Result<()> {
     std::process::Command::new("xdg-open")
         .arg(url.to_string())
         .spawn()?;
