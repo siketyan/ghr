@@ -19,7 +19,7 @@ async-trait = "0.1.68"
 build-info = "0.0.30"
 clap = { version = "4.2", features = ["derive"] }
 console = "0.15.2"
-dialoguer = "0.10.2"
+dialoguer = "0.10.4"
 dirs = "5.0"
 git2 = "0.16.1"
 itertools = "0.10.5"
