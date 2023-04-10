@@ -5,13 +5,13 @@ use octocrab::Octocrab;
 use serde::Deserialize;
 
 use crate::platform::{Browse, Fork, Platform, PlatformInit};
-use crate::url::{Scheme, Url};
+use crate::url::Url;
 
 fn default_host() -> String {
     GITHUB_COM.to_string()
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     #[serde(default = "default_host")]
     pub(super) host: String,
@@ -27,6 +27,7 @@ impl Default for Config {
 
 pub struct GitHub {
     client: Octocrab,
+    config: Config,
 }
 
 impl PlatformInit for GitHub {
@@ -50,6 +51,7 @@ impl PlatformInit for GitHub {
 
         Ok(Self {
             client: builder.build()?,
+            config: config.clone(),
         })
     }
 }
@@ -80,9 +82,7 @@ impl Browse for GitHub {
     async fn get_browsable_url(&self, url: &Url) -> Result<url::Url> {
         Ok(url::Url::parse(&format!(
             "https://{}/{}/{}",
-            url.host.to_string(),
-            url.owner,
-            url.repo
+            self.config.host, url.owner, url.repo
         ))?)
     }
 }
