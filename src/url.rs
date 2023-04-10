@@ -287,7 +287,7 @@ impl ToString for Host {
     }
 }
 
-#[derive(Debug, Default, Eq, PartialEq)]
+#[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct Url {
     pub vcs: Vcs,
     pub scheme: Scheme,
