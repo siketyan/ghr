@@ -12,7 +12,7 @@ To achieve that, ghq was not enough for me.
 So I have rewritten them as simple, in Rust, the robust and modern language today.
 
 ## 📦 Installation
-### Using Homebrew (easy)
+### macOS / Using Homebrew (easy)
 ```shell
 brew install siketyan/tap/ghr
 ```
@@ -23,7 +23,19 @@ To upgrade:
 brew upgrade siketyan/tap/ghr
 ```
 
-### Using cargo (classic)
+### Windows / Using scoop (easy)
+```shell
+scoop bucket add siketyan https://github.com/siketyan/scoop-bucket.git
+scoop install ghr
+```
+
+To upgrade:
+
+```shell
+scoop update ghr
+```
+
+### Any OS / Using cargo (classic)
 If you have not installed Rust environment, follow the instruction of [rustup](https://rustup.rs/).
 
 ```shell
