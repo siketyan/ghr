@@ -1,13 +1,14 @@
 use std::path::PathBuf;
+use std::time::Duration;
 
 use anyhow::{anyhow, Result};
 use async_hofs::iter::AsyncMapExt;
 use clap::Parser;
 use console::style;
 use git2::Repository;
-use itertools::Itertools;
+use tokio::time::sleep;
 use tokio_stream::StreamExt;
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::config::Config;
 use crate::console::Spinner;
@@ -15,6 +16,11 @@ use crate::git::{CloneOptions, CloneRepository};
 use crate::path::Path;
 use crate::root::Root;
 use crate::url::Url;
+
+// Constant values taken from implementation of GitHub Cli (gh)
+// ref: https://github.com/cli/cli/blob/350011/pkg/cmd/repo/fork/fork.go#L328-L344
+const CLONE_RETRY_COUNT: u32 = 3;
+const CLONE_RETRY_DURATION: Duration = Duration::from_secs(2);
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
@@ -53,11 +59,12 @@ impl Cmd {
         let repo: Vec<CloneResult> = Spinner::new("Cloning the repository...")
             .spin_while(|| async move {
                 urls.into_iter()
-                    .map(|url| {
+                    .async_map(|url| async {
                         info!("Cloning from '{}'", url.to_string());
-                        self.clone(&root, &config, url)
+                        self.clone(&root, &config, url).await
                     })
-                    .try_collect()
+                    .collect::<Result<Vec<_>>>()
+                    .await
             })
             .await?;
 
@@ -113,20 +120,35 @@ impl Cmd {
         Ok(url)
     }
 
-    fn clone(&self, root: &Root, config: &Config, url: Url) -> Result<CloneResult> {
+    async fn clone(&self, root: &Root, config: &Config, url: Url) -> Result<CloneResult> {
         let path = PathBuf::from(Path::resolve(root, &url));
         let profile = config
             .rules
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        config.git.strategy.clone.clone_repository(
-            url,
-            &path,
-            &CloneOptions {
-                recursive: self.recursive,
-            },
-        )?;
+        for chances_left in (0..CLONE_RETRY_COUNT).rev() {
+            match config.git.strategy.clone.clone_repository(
+                url.clone(),
+                &path,
+                &CloneOptions {
+                    recursive: self.recursive,
+                },
+            ) {
+                Ok(_) => break,
+                Err(e) => {
+                    if chances_left > 0 {
+                        warn!(
+                            "Cloning failed. Retrying in {} seconds",
+                            CLONE_RETRY_DURATION.as_secs()
+                        );
+                        sleep(CLONE_RETRY_DURATION).await;
+                    } else {
+                        return Err(e);
+                    }
+                }
+            }
+        }
 
         let repo = Repository::open(&path)?;
         let profile = if let Some((name, p)) = profile {
