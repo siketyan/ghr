@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use itertools::Itertools;
+use std::path::PathBuf;
 
 use crate::repository::Repositories;
 use crate::root::Root;
@@ -14,6 +15,10 @@ pub struct Cmd {
     /// Lists repositories without their owners.
     #[clap(long)]
     no_owner: bool,
+
+    /// Lists repositories as full paths.
+    #[clap(long)]
+    full_path: bool,
 }
 
 impl Cmd {
@@ -22,7 +27,12 @@ impl Cmd {
 
         Repositories::try_collect(&root)?
             .into_iter()
-            .map(|(path, _)| path.to_string_with(!self.no_host, !self.no_owner))
+            .map(|(path, _)| match self {
+                Cmd {
+                    full_path: true, ..
+                } => PathBuf::from(path).to_string_lossy().to_string(),
+                _ => path.to_string_with(!self.no_host, !self.no_owner),
+            })
             .sorted()
             .for_each(|path| println!("{}", path));
 
