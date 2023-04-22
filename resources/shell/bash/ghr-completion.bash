@@ -55,7 +55,7 @@ __ghr_complete() {
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
   delete)
-    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    COMPREPLY=($(__ghr_complete__repos "${cword}"))
     ;;
   init)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))

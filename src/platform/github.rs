@@ -46,7 +46,7 @@ impl PlatformInit for GitHub {
 
         let mut builder = Octocrab::builder().personal_token(token);
         if config.host != GITHUB_COM {
-            builder = builder.base_url(format!("https://{}/api/v3", &config.host))?;
+            builder = builder.base_uri(format!("https://{}/api/v3", &config.host))?;
         }
 
         Ok(Self {
