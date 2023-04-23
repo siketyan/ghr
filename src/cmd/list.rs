@@ -16,9 +16,9 @@ pub struct Cmd {
     #[clap(long)]
     no_owner: bool,
 
-    /// Lists repositories as full paths.
-    #[clap(long)]
-    full_path: bool,
+    /// Lists repositories as full paths instead of their names.
+    #[clap(short, long)]
+    path: bool,
 }
 
 impl Cmd {
@@ -27,10 +27,8 @@ impl Cmd {
 
         Repositories::try_collect(&root)?
             .into_iter()
-            .map(|(path, _)| match self {
-                Cmd {
-                    full_path: true, ..
-                } => PathBuf::from(path).to_string_lossy().to_string(),
+            .map(|(path, _)| match self.path {
+                true => PathBuf::from(path).to_string_lossy().to_string(),
                 _ => path.to_string_with(!self.no_host, !self.no_owner),
             })
             .sorted()
