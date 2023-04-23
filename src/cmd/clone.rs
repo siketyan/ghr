@@ -127,26 +127,23 @@ impl Cmd {
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        for chances_left in (0..CLONE_RETRY_COUNT).rev() {
-            match config.git.strategy.clone.clone_repository(
-                url.clone(),
-                &path,
-                &CloneOptions {
-                    recursive: self.recursive,
-                },
-            ) {
-                Ok(_) => break,
-                Err(e) => {
-                    if chances_left > 0 {
-                        warn!(
-                            "Cloning failed. Retrying in {} seconds",
-                            CLONE_RETRY_DURATION.as_secs()
-                        );
-                        sleep(CLONE_RETRY_DURATION).await;
-                    } else {
-                        return Err(e);
-                    }
-                }
+        let mut retries = 0;
+        while let Err(e) = config.git.strategy.clone.clone_repository(
+            url.clone(),
+            &path,
+            &CloneOptions {
+                recursive: self.recursive,
+            },
+        ) {
+            retries += 1;
+            if retries > CLONE_RETRY_COUNT {
+                return Err(e);
+            } else {
+                warn!(
+                    "Cloning failed. Retrying in {} seconds",
+                    CLONE_RETRY_DURATION.as_secs(),
+                );
+                sleep(CLONE_RETRY_DURATION).await;
             }
         }
 
