@@ -93,7 +93,9 @@ Commands:
   help     Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help  Print help information
+  -q, --quiet    Operates quietly. Errors will be reported even if this option is enabled
+  -v, --verbose  Operates verbosely. Traces, debug logs will be reported
+  -h, --help     Print help
 ```
 
 ### Cloning a repository
