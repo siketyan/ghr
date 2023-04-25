@@ -16,13 +16,20 @@ impl CloneRepository for Cli {
     {
         debug!("Cloning the repository using CLI strategy");
 
-        let url = url.to_string();
-        let mut args = vec!["clone", &url, path.as_ref().to_str().unwrap()];
-        if options.recursive {
-            args.push("--recursive");
+        let mut args = vec![
+            "clone".to_string(),
+            url.to_string(),
+            path.as_ref().to_string_lossy().to_string(),
+        ];
+
+        if let Some(recursive) = options.recursive.as_ref() {
+            args.push(match recursive.as_deref() {
+                Some(path) => format!("--recurse-submodules={path}"),
+                _ => "--recurse-submodules".to_string(),
+            });
         }
         if options.single_branch {
-            args.push("--single-branch")
+            args.push("--single-branch".to_string());
         }
 
         let output = Command::new("git").args(args).output()?;

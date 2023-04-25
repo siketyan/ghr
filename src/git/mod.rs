@@ -9,7 +9,7 @@ use anyhow::Result;
 
 #[derive(Debug, Default)]
 pub struct CloneOptions {
-    pub recursive: bool,
+    pub recursive: Option<Option<String>>,
     pub single_branch: bool,
 }
 
