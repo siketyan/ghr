@@ -193,7 +193,7 @@ impl Cmd {
             },
         ) {
             retries += 1;
-            if retries > CLONE_RETRY_COUNT {
+            if self.fork.is_none() || retries > CLONE_RETRY_COUNT {
                 return Err(e);
             } else {
                 warn!(
