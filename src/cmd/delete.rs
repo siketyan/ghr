@@ -16,7 +16,7 @@ use crate::url::Url;
 #[derive(Debug, Parser)]
 pub struct Cmd {
     /// URL or pattern of the repository to delete.
-    repo: String,
+    repo: Vec<String>,
 }
 
 impl Cmd {
@@ -34,21 +34,19 @@ impl Cmd {
             return Ok(());
         }
 
-        let url = Url::from_str(
-            &self.repo,
-            &config.patterns,
-            config.defaults.owner.as_deref(),
-        )?;
-        let path = PathBuf::from(Path::resolve(&root, &url));
+        for repo in self.repo.iter() {
+            let url = Url::from_str(repo, &config.patterns, config.defaults.owner.as_deref())?;
+            let path = PathBuf::from(Path::resolve(&root, &url));
 
-        Spinner::new("Deleting the repository...")
-            .spin_while(|| ready(std::fs::remove_dir_all(&path).map_err(anyhow::Error::from)))
-            .await?;
+            Spinner::new("Deleting the repository...")
+                .spin_while(|| ready(std::fs::remove_dir_all(&path).map_err(anyhow::Error::from)))
+                .await?;
 
-        info!(
-            "Deleted the repository successfully: {}",
-            path.to_string_lossy(),
-        );
+            info!(
+                "Deleted the repository successfully: {}",
+                path.to_string_lossy(),
+            );
+        }
 
         Ok(())
     }
