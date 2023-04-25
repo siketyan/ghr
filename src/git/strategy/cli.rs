@@ -21,6 +21,9 @@ impl CloneRepository for Cli {
         if options.recursive {
             args.push("--recursive");
         }
+        if options.single_branch {
+            args.push("--single-branch")
+        }
 
         let output = Command::new("git").args(args).output()?;
         match output.status.success() {

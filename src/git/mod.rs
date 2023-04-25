@@ -10,6 +10,7 @@ use anyhow::Result;
 #[derive(Debug, Default)]
 pub struct CloneOptions {
     pub recursive: bool,
+    pub single_branch: bool,
 }
 
 pub trait CloneRepository {
