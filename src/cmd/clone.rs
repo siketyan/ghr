@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::{anyhow, Result};
@@ -11,7 +12,7 @@ use tokio_stream::StreamExt;
 use tracing::{info, warn};
 
 use crate::config::Config;
-use crate::console::Spinner;
+use crate::console::{MultiSpinner, Spinner};
 use crate::git::{CloneOptions, CloneRepository};
 use crate::path::Path;
 use crate::root::Root;
@@ -30,6 +31,10 @@ pub struct Cmd {
     /// Forks the repository in the specified owner (organisation) and clones the forked repo.
     #[clap(long)]
     fork: Option<Option<String>>,
+
+    /// Clones multiple repositories in parallel.
+    #[clap(short, long)]
+    parallel: bool,
 
     /// Clones their submodules recursively.
     #[clap(short, long)]
@@ -56,19 +61,12 @@ impl Cmd {
             .collect::<Result<Vec<_>>>()
             .await?;
 
-        let repo: Vec<CloneResult> = Spinner::new("Cloning the repository...")
-            .spin_while(|| async move {
-                urls.into_iter()
-                    .async_map(|url| async {
-                        info!("Cloning from '{}'", url.to_string());
-                        self.clone(&root, &config, url).await
-                    })
-                    .collect::<Result<Vec<_>>>()
-                    .await
-            })
-            .await?;
-
-        repo.iter().for_each(
+        match self.parallel {
+            true => self.clone_parallel(root, config, urls).await?,
+            _ => self.clone_serial(&root, &config, urls).await?,
+        }
+        .into_iter()
+        .for_each(
             |CloneResult {
                  path,
                  profile,
@@ -118,6 +116,50 @@ impl Cmd {
         }
 
         Ok(url)
+    }
+
+    async fn clone_serial(
+        self,
+        root: &Root,
+        config: &Config,
+        urls: Vec<Url>,
+    ) -> Result<Vec<CloneResult>> {
+        Spinner::new("Cloning the repository...")
+            .spin_while(|| async move {
+                urls.into_iter()
+                    .async_map(|url| async {
+                        info!("Cloning from '{}'", url.to_string());
+                        self.clone(root, config, url).await
+                    })
+                    .collect::<Result<Vec<_>>>()
+                    .await
+            })
+            .await
+    }
+
+    async fn clone_parallel(
+        self,
+        root: Root,
+        config: Config,
+        urls: Vec<Url>,
+    ) -> Result<Vec<CloneResult>> {
+        let this = Arc::new(self);
+        let root = Arc::new(root);
+        let config = Arc::new(config);
+
+        let mut spinner = MultiSpinner::new();
+        for url in urls {
+            let this = Arc::clone(&this);
+            let root = Arc::clone(&root);
+            let config = Arc::clone(&config);
+
+            spinner = spinner.with_spin_while(
+                format!("Cloning from {}...", url.to_string()),
+                move || async move { this.as_ref().clone(&root, &config, url).await },
+            );
+        }
+
+        Ok(spinner.collect().await?.into_iter().collect())
     }
 
     async fn clone(&self, root: &Root, config: &Config, url: Url) -> Result<CloneResult> {
