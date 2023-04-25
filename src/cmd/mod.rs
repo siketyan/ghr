@@ -10,8 +10,12 @@ mod profile;
 mod shell;
 mod version;
 
+use std::io::stderr;
+
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use tracing_subscriber::filter::LevelFilter;
+use tracing_subscriber::EnvFilter;
 
 #[derive(Debug, Subcommand)]
 pub enum Action {
@@ -43,10 +47,34 @@ pub enum Action {
 pub struct Cli {
     #[clap(subcommand)]
     action: Action,
+
+    /// Operates quietly. Errors will be reported even if this option is enabled.
+    #[clap(short, long, global = true)]
+    quiet: bool,
+
+    /// Operates verbosely. Traces, debug logs will be reported.
+    #[clap(short, long, global = true)]
+    verbose: bool,
 }
 
 impl Cli {
     pub async fn run(self) -> Result<()> {
+        tracing_subscriber::fmt()
+            .compact()
+            .without_time()
+            .with_target(false)
+            .with_env_filter(
+                EnvFilter::builder()
+                    .with_default_directive(match (self.quiet, self.verbose) {
+                        (true, _) => LevelFilter::ERROR.into(),
+                        (_, true) => LevelFilter::TRACE.into(),
+                        _ => LevelFilter::INFO.into(),
+                    })
+                    .from_env_lossy(),
+            )
+            .with_writer(stderr)
+            .init();
+
         use Action::*;
         match self.action {
             Cd(cmd) => cmd.run(),
