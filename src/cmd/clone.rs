@@ -37,8 +37,8 @@ pub struct Cmd {
     parallel: bool,
 
     /// Clones their submodules recursively.
-    #[clap(short, long)]
-    recursive: bool,
+    #[clap(short, long, alias = "recurse-submodules")]
+    recursive: Option<Option<String>>,
 
     /// Clones only the default branch.
     #[clap(long)]
@@ -178,7 +178,7 @@ impl Cmd {
             url.clone(),
             &path,
             &CloneOptions {
-                recursive: self.recursive,
+                recursive: self.recursive.clone(),
                 single_branch: self.single_branch,
             },
         ) {
