@@ -40,6 +40,10 @@ pub struct Cmd {
     #[clap(short, long)]
     recursive: bool,
 
+    /// Clones only the default branch.
+    #[clap(long)]
+    single_branch: bool,
+
     /// Change directory after cloning the repository (Shell extension required).
     #[clap(long)]
     cd: bool,
@@ -175,6 +179,7 @@ impl Cmd {
             &path,
             &CloneOptions {
                 recursive: self.recursive,
+                single_branch: self.single_branch,
             },
         ) {
             retries += 1;
