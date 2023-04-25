@@ -44,6 +44,14 @@ pub struct Cmd {
     #[clap(long)]
     single_branch: bool,
 
+    /// Uses this name instead of `origin` for the upstream remote.
+    #[clap(short, long)]
+    origin: Option<String>,
+
+    /// Points the specified branch instead of the default branch after cloned the repository.
+    #[clap(short, long)]
+    branch: Option<String>,
+
     /// Change directory after cloning the repository (Shell extension required).
     #[clap(long)]
     cd: bool,
@@ -180,6 +188,8 @@ impl Cmd {
             &CloneOptions {
                 recursive: self.recursive.clone(),
                 single_branch: self.single_branch,
+                origin: self.origin.clone(),
+                branch: self.branch.clone(),
             },
         ) {
             retries += 1;

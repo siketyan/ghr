@@ -11,6 +11,8 @@ use anyhow::Result;
 pub struct CloneOptions {
     pub recursive: Option<Option<String>>,
     pub single_branch: bool,
+    pub origin: Option<String>,
+    pub branch: Option<String>,
 }
 
 pub trait CloneRepository {
