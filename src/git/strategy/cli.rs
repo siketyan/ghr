@@ -31,6 +31,12 @@ impl CloneRepository for Cli {
         if options.single_branch {
             args.push("--single-branch".to_string());
         }
+        if let Some(origin) = options.origin.as_deref() {
+            args.push(format!("--origin={origin}"));
+        }
+        if let Some(branch) = options.branch.as_deref() {
+            args.push(format!("--branch={branch}"));
+        }
 
         let output = Command::new("git").args(args).output()?;
         match output.status.success() {
