@@ -171,21 +171,21 @@ version = "0.0.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b301350c1c448e35b896f32b68c49c8ecd969a71978fbafc4ebd09ec3f4eee2"
 dependencies = [
- "build-info-common 0.0.31",
+ "build-info-common",
  "build-info-proc",
  "once_cell",
 ]
 
 [[package]]
 name = "build-info-build"
-version = "0.0.30"
+version = "0.0.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a81141b1af6bc87316a3fdcc3b33658f7a9153c7677da6b0e57d762c87f8ee61"
+checksum = "2b314717755dd6a06fc11ad3f7909ba4c0ae2ab516f5cb0404fe924c71bfc7d0"
 dependencies = [
  "anyhow",
  "base64 0.21.0",
  "bincode",
- "build-info-common 0.0.30",
+ "build-info-common",
  "cargo_metadata",
  "chrono",
  "git2",
@@ -195,18 +195,6 @@ dependencies = [
  "rustc_version",
  "serde_json",
  "xz2",
-]
-
-[[package]]
-name = "build-info-common"
-version = "0.0.30"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0209923629b6854e590663db44001ea7cf35b3c7c13b04428c227f42bfda0489"
-dependencies = [
- "chrono",
- "derive_more",
- "semver",
- "serde",
 ]
 
 [[package]]
@@ -230,7 +218,7 @@ dependencies = [
  "anyhow",
  "base64 0.21.0",
  "bincode",
- "build-info-common 0.0.31",
+ "build-info-common",
  "chrono",
  "num-bigint",
  "num-traits",
@@ -807,9 +795,9 @@ checksum = "ad0a93d233ebf96623465aad4046a8d3aa4da22d4f4beba5388838c8a434bbb4"
 
 [[package]]
 name = "git2"
-version = "0.16.1"
+version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccf7f68c2995f392c49fffb4f95ae2c873297830eb25c6bc4c114ce8f4562acc"
+checksum = "8b7905cdfe33d31a88bb2e8419ddd054451f5432d1da9eaf2ac7804ee1ea12d5"
 dependencies = [
  "bitflags",
  "libc",
@@ -1129,9 +1117,9 @@ checksum = "6a987beff54b60ffa6d51982e1aa1146bc42f19bd26be28b0586f252fccf5317"
 
 [[package]]
 name = "libgit2-sys"
-version = "0.14.2+1.5.1"
+version = "0.15.1+1.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f3d95f6b51075fe9810a7ae22c7095f12b98005ab364d8544797a825ce946a4"
+checksum = "fb4577bde8cdfc7d6a2a4bcb7b049598597de33ffd337276e9c7db6cd4a2cee7"
 dependencies = [
  "cc",
  "libc",
@@ -1143,9 +1131,9 @@ dependencies = [
 
 [[package]]
 name = "libssh2-sys"
-version = "0.2.23"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b094a36eb4b8b8c8a7b4b8ae43b2944502be3e59cd87687595cf6b0a71b3f4ca"
+checksum = "2dc8a030b787e2119a731f1951d6a773e2280c660f8ec4b0f5e1505a386e71ee"
 dependencies = [
  "cc",
  "libc",
