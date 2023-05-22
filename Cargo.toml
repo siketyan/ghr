@@ -18,7 +18,7 @@ async-hofs = "0.1.1"
 async-trait = "0.1.68"
 build-info = "0.0.31"
 clap = { version = "4.3", features = ["derive"] }
-console = "0.15.2"
+console = "0.15.7"
 dialoguer = "0.10.4"
 dirs = "5.0"
 git2 = "0.17.1"
