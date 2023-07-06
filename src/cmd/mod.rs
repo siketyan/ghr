@@ -1,3 +1,4 @@
+mod add;
 mod browse;
 mod cd;
 mod clone;
@@ -19,6 +20,10 @@ use tracing_subscriber::EnvFilter;
 
 #[derive(Debug, Subcommand)]
 pub enum Action {
+    /// Add an existing repository into the ghr managed directory.
+    Add(add::Cmd),
+    /// Browse a repository on web.
+    Browse(browse::Cmd),
     /// Change directory to one of the managed repositories (Shell extension required).
     Cd(cd::Cmd),
     /// Clones a Git repository to local.
@@ -31,8 +36,6 @@ pub enum Action {
     List(list::Cmd),
     /// Opens a repository in an application.
     Open(open::Cmd),
-    /// Browse a repository on web.
-    Browse(browse::Cmd),
     /// Prints the path to root, owner, or a repository.
     Path(path::Cmd),
     /// Manages profiles to use in repositories.
@@ -77,6 +80,7 @@ impl Cli {
 
         use Action::*;
         match self.action {
+            Add(cmd) => cmd.run(),
             Cd(cmd) => cmd.run(),
             Clone(cmd) => cmd.run().await,
             Delete(cmd) => cmd.run().await,
