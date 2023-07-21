@@ -100,6 +100,8 @@ impl Cmd {
             path.to_string_lossy(),
         );
 
+        let repo = Repository::open(&path)?;
+
         if let Some((name, p)) = profile {
             p.apply(&mut repo.config()?)?;
 
