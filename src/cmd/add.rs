@@ -1,7 +1,7 @@
-use std::fs::rename;
+use std::fs::{create_dir_all, rename};
 use std::path::PathBuf;
 
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use clap::Parser;
 use console::style;
 use dialoguer::Confirm;
@@ -78,6 +78,20 @@ impl Cmd {
                 .interact()?
         {
             return Ok(());
+        }
+
+        let parent_path = path
+            .parent()
+            .ok_or_else(|| {
+                anyhow!(
+                    "Failed to determine parent path for the repository's new location: {}",
+                    path.to_string_lossy()
+                )
+            })?
+            .to_path_buf();
+
+        if !parent_path.as_path().is_dir() {
+            create_dir_all(&parent_path)?
         }
 
         rename(&self.repo, &path)?;
