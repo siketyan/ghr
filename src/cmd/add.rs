@@ -90,7 +90,7 @@ impl Cmd {
             })?
             .to_path_buf();
 
-        create_dir_all(&parent_path)?;
+        create_dir_all(parent_path)?;
 
         rename(&self.repo, &path)?;
         info!(
