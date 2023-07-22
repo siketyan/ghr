@@ -23,29 +23,22 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Install latest stable
-        uses: ructions/toolchain@v2
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
+          targets: ${{ matrix.target }}
           components: rustfmt,clippy
 
-      - name: Run clippy
-        uses: ructions/clippy-check@v1
-        with:
-          token: ${{ github.token }}
-          args: --all-features
-
       - name: Run rustfmt
-        uses: ructions/cargo@v1
+        run: cargo fmt --all --check
+
+      - name: Run clippy
+        uses: giraffate/clippy-action@v1
         with:
-          command: fmt
-          args: --all --check
+          reporter: 'github-pr-check'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
-        uses: ructions/cargo@v1
-        with:
-          command: test
-          args: --all-features
+        run: cargo test --all-features
 
   build:
     strategy:
@@ -80,11 +73,9 @@ jobs:
           submodules: true
 
       - name: Install latest stable
-        uses: ructions/toolchain@v2
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
 
       - id: cache-key
         run: echo "key=$(echo '${{ toJSON(matrix) }}' | shasum -a 256)" >> $GITHUB_OUTPUT
@@ -93,12 +84,13 @@ jobs:
         with:
           key: ${{ steps.cache-key.outputs.key }}
 
-      - name: Build
-        uses: ructions/cargo@v1
-        with:
-          command: build
-          args: --release --features vendored --target '${{ matrix.target }}'
-          use-cross: ${{ matrix.cross }}
+      - name: Build (native)
+        if: ${{ !matrix.cross }}
+        run: cargo build --release --features vendored --target '${{ matrix.target }}'
+
+      - name: Build (cross)
+        if: ${{ matrix.cross }}
+        run: cross build --release --features vendored --target '${{ matrix.target }}'
 
       - name: Compress artifacts into .tar.gz file
         run: tar -C ./target/${{ matrix.target }}/release -czf ghr-${{ matrix.target }}.tar.gz ${{ matrix.artifact }}
