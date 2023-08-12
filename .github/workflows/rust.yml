@@ -50,22 +50,20 @@ jobs:
           - x86_64-unknown-linux-gnu
           - aarch64-unknown-linux-gnu
         include:
+          - cargo: cargo
+            artifact: ghr
           - target: x86_64-pc-windows-msvc
             host: windows-2022
             artifact: ghr.exe
           - target: x86_64-apple-darwin
             host: macos-12
-            artifact: ghr
           - target: aarch64-apple-darwin
             host: macos-12
-            artifact: ghr
           - target: x86_64-unknown-linux-gnu
             host: ubuntu-22.04
-            artifact: ghr
           - target: aarch64-unknown-linux-gnu
             host: ubuntu-22.04
-            artifact: ghr
-            cross: true
+            cargo: cross
     runs-on: ${{ matrix.host }}
     steps:
       - uses: actions/checkout@v3
@@ -77,6 +75,12 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Install cross
+        if: ${{ matrix.cargo == 'cross' }}
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+          cargo-binstall -y cross
+
       - id: cache-key
         run: echo "key=$(echo '${{ toJSON(matrix) }}' | shasum -a 256)" >> $GITHUB_OUTPUT
 
@@ -84,13 +88,8 @@ jobs:
         with:
           key: ${{ steps.cache-key.outputs.key }}
 
-      - name: Build (native)
-        if: ${{ !matrix.cross }}
-        run: cargo build --release --features vendored --target '${{ matrix.target }}'
-
-      - name: Build (cross)
-        if: ${{ matrix.cross }}
-        run: cross build --release --features vendored --target '${{ matrix.target }}'
+      - name: Build
+        run: ${{ matrix.cargo }} build --release --features vendored --target '${{ matrix.target }}'
 
       - name: Compress artifacts into .tar.gz file
         run: tar -C ./target/${{ matrix.target }}/release -czf ghr-${{ matrix.target }}.tar.gz ${{ matrix.artifact }}
