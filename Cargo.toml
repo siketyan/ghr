@@ -29,7 +29,7 @@ regex = "1.9"
 serde = { version = "1.0", features = ["derive"] }
 serde_regex = "1.1"
 serde_with = "3.2"
-tokio = { version = "1.29", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.30", features = ["macros", "rt-multi-thread"] }
 tokio-stream = "0.1.14"
 toml = "0.7.5"
 tracing = "0.1.37"
