@@ -4,16 +4,18 @@ use std::process::Command;
 use anyhow::anyhow;
 use tracing::debug;
 
-use crate::git::{CloneOptions, CloneRepository};
+use crate::git::{CloneOptions, CloneRepository, Progress};
 
 pub struct Cli;
 
 impl CloneRepository for Cli {
-    fn clone_repository<U, P>(&self, url: U, path: P, options: &CloneOptions) -> anyhow::Result<()>
-    where
-        U: ToString,
-        P: AsRef<Path>,
-    {
+    fn clone_repository(
+        &self,
+        url: impl ToString,
+        path: impl AsRef<Path>,
+        progress: impl Progress,
+        options: &CloneOptions,
+    ) -> anyhow::Result<()> {
         debug!("Cloning the repository using CLI strategy");
 
         let mut args = vec![

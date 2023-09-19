@@ -7,6 +7,10 @@ use std::path::Path;
 
 use anyhow::Result;
 
+pub trait Progress {
+    fn progress(&self, text: &str);
+}
+
 #[derive(Debug, Default)]
 pub struct CloneOptions {
     pub recursive: Option<Option<String>>,
@@ -16,8 +20,11 @@ pub struct CloneOptions {
 }
 
 pub trait CloneRepository {
-    fn clone_repository<U, P>(&self, url: U, path: P, options: &CloneOptions) -> Result<()>
-    where
-        U: ToString,
-        P: AsRef<Path>;
+    fn clone_repository(
+        &self,
+        url: impl ToString,
+        path: impl AsRef<Path>,
+        progress: impl Progress,
+        options: &CloneOptions,
+    ) -> Result<()>;
 }
