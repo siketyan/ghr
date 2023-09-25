@@ -16,7 +16,7 @@ authors = [
 anyhow = "1.0"
 async-hofs = "0.1.1"
 async-trait = "0.1.73"
-build-info = "0.0.31"
+build-info = "0.0.33"
 clap = { version = "4.4", features = ["derive"] }
 console = "0.15.7"
 dialoguer = "0.11.0"
