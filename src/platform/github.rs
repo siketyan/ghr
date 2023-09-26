@@ -35,14 +35,12 @@ impl PlatformInit for GitHub {
 
     fn init(config: &Config) -> Result<Self> {
         let token = Hosts::load()?
-            .get(&config.host)
+            .retrieve_token(&config.host)?
             .ok_or_else(|| {
                 anyhow!(
                     "gh CLI does not have any token for github.com. Run `gh auth login` and retry."
                 )
-            })?
-            .oauth_token
-            .clone();
+            })?;
 
         let mut builder = Octocrab::builder().personal_token(token);
         if config.host != GITHUB_COM {
