@@ -9,8 +9,7 @@ use crate::url::Url;
 fn open_url(url: &url::Url) -> Result<()> {
     use std::ffi::CString;
 
-    use windows::core::PCSTR;
-    use windows::s;
+    use windows::core::{s, PCSTR};
     use windows::Win32::Foundation::HWND;
     use windows::Win32::UI::Shell::ShellExecuteA;
     use windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD;
