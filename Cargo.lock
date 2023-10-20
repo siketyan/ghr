@@ -396,30 +396,6 @@ dependencies = [
 
 [[package]]
 name = "build-info-common"
-version = "0.0.33"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3b772d111f4cc62aa9018ba5cad5a1748a6d9a286d91a69b748cd233e43cdbd"
-dependencies = [
- "chrono",
- "derive_more",
- "semver",
- "serde",
-]
-
-[[package]]
-name = "build-info-common"
-version = "0.0.34"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8209c0c2b13da7e5f7202e591b6d41b46c8f0e78d031dedf5cff71cc8c6ec773"
-dependencies = [
- "chrono",
- "derive_more",
- "semver",
- "serde",
-]
-
-[[package]]
-name = "build-info-common"
 version = "0.0.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8209c0c2b13da7e5f7202e591b6d41b46c8f0e78d031dedf5cff71cc8c6ec773"
@@ -1440,17 +1416,6 @@ name = "log"
 version = "0.4.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
-
-[[package]]
-name = "lzma-sys"
-version = "0.1.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fda04ab3764e6cde78b9974eec4f779acaba7c4e84b36eca3cf77c581b85d27"
-dependencies = [
- "cc",
- "libc",
- "pkg-config",
-]
 
 [[package]]
 name = "matchers"
@@ -3174,15 +3139,6 @@ checksum = "2769203cd13a0c6015d515be729c526d041e9cf2c0cc478d57faee85f40c6dcd"
 dependencies = [
  "nix",
  "winapi",
-]
-
-[[package]]
-name = "xz2"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "388c44dc09d76f1536602ead6d325eb532f5c122f17782bd57fb47baeeb767e2"
-dependencies = [
- "lzma-sys",
 ]
 
 [[package]]
