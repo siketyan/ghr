@@ -181,26 +181,30 @@ impl Cmd {
             .resolve(&url)
             .and_then(|r| config.profiles.resolve(&r.profile));
 
-        let mut retries = 0;
-        while let Err(e) = config.git.strategy.clone.clone_repository(
-            url.clone(),
-            &path,
-            &CloneOptions {
-                recursive: self.recursive.clone(),
-                single_branch: self.single_branch,
-                origin: self.origin.clone(),
-                branch: self.branch.clone(),
-            },
-        ) {
-            retries += 1;
-            if self.fork.is_none() || retries > CLONE_RETRY_COUNT {
-                return Err(e);
-            } else {
-                warn!(
-                    "Cloning failed. Retrying in {} seconds",
-                    CLONE_RETRY_DURATION.as_secs(),
-                );
-                sleep(CLONE_RETRY_DURATION).await;
+        if path.exists() {
+            warn!("Directory already exists. Skipping cloning the repository...");
+        } else {
+            let mut retries = 0;
+            while let Err(e) = config.git.strategy.clone.clone_repository(
+                url.clone(),
+                &path,
+                &CloneOptions {
+                    recursive: self.recursive.clone(),
+                    single_branch: self.single_branch,
+                    origin: self.origin.clone(),
+                    branch: self.branch.clone(),
+                },
+            ) {
+                retries += 1;
+                if self.fork.is_none() || retries > CLONE_RETRY_COUNT {
+                    return Err(e);
+                } else {
+                    warn!(
+                        "Cloning failed. Retrying in {} seconds",
+                        CLONE_RETRY_DURATION.as_secs(),
+                    );
+                    sleep(CLONE_RETRY_DURATION).await;
+                }
             }
         }
 
