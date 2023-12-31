@@ -23,42 +23,42 @@ use crate::url::Url;
 const CLONE_RETRY_COUNT: u32 = 3;
 const CLONE_RETRY_DURATION: Duration = Duration::from_secs(2);
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Default, Parser)]
 pub struct Cmd {
     /// URL or pattern of the repository to clone.
-    repo: Vec<String>,
+    pub(crate) repo: Vec<String>,
 
     /// Forks the repository in the specified owner (organisation) and clones the forked repo.
     #[clap(long)]
-    fork: Option<Option<String>>,
+    pub(crate) fork: Option<Option<String>>,
 
     /// Clones multiple repositories in parallel.
     #[clap(short, long)]
-    parallel: bool,
+    pub(crate) parallel: bool,
 
     /// Clones their submodules recursively.
     #[clap(short, long, alias = "recurse-submodules")]
-    recursive: Option<Option<String>>,
+    pub(crate) recursive: Option<Option<String>>,
 
     /// Clones only the default branch.
     #[clap(long)]
-    single_branch: bool,
+    pub(crate) single_branch: bool,
 
     /// Uses this name instead of `origin` for the upstream remote.
     #[clap(short, long)]
-    origin: Option<String>,
+    pub(crate) origin: Option<String>,
 
     /// Points the specified branch instead of the default branch after cloned the repository.
     #[clap(short, long)]
-    branch: Option<String>,
+    pub(crate) branch: Option<String>,
 
     /// Change directory after cloning the repository (Shell extension required).
     #[clap(long)]
-    cd: bool,
+    pub(crate) cd: bool,
 
     /// Opens the directory after cloning the repository.
     #[clap(long)]
-    open: Option<Option<String>>,
+    pub(crate) open: Option<Option<String>>,
 }
 
 impl Cmd {

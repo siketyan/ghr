@@ -94,7 +94,7 @@ impl Cli {
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),
-            Sync(cmd) => cmd.run(),
+            Sync(cmd) => cmd.run().await,
             Version(cmd) => cmd.run(),
         }
     }

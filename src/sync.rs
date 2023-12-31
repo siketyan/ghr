@@ -8,7 +8,18 @@ use tracing::warn;
 use crate::path::Path;
 
 #[derive(Deserialize, Serialize)]
-pub enum Ref {}
+pub struct BranchRef {
+    pub name: String,
+    pub remote: String,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(tag = "type")]
+pub enum Ref {
+    Remote(String),
+    Branch(BranchRef),
+    // tag is not supported ... yet.
+}
 
 #[derive(Deserialize, Serialize)]
 pub struct Remote {
@@ -22,7 +33,7 @@ pub struct Repository {
     pub host: String,
     pub owner: String,
     pub repo: String,
-    pub r#ref: String,
+    pub r#ref: Option<Ref>,
     #[serde(default)]
     pub remotes: Vec<Remote>,
 }
@@ -46,19 +57,25 @@ impl Repository {
             },
         };
 
-        if let Err(e) = Self::ensure_synced(&repo, &head) {
-            warn!("Repository {} is not synced to remote: {}", path, e);
-        }
+        let r#ref = match Self::synced_ref(&repo, &head) {
+            Ok(r) => Some(r),
+            Err(e) => {
+                warn!("Repository {} is not synced to remote: {}", path, e);
+                None
+            }
+        };
 
-        let r#ref = head.name().unwrap_or_default().to_string();
+        let remotes = repo.remotes()?;
+        if remotes.is_empty() {
+            bail!("No remotes defined");
+        }
 
         Ok(Self {
             host: path.host.to_string(),
             owner: path.owner.to_string(),
             repo: path.repo.to_string(),
             r#ref,
-            remotes: repo
-                .remotes()?
+            remotes: remotes
                 .iter()
                 .flatten()
                 .map(|name| {
@@ -74,16 +91,14 @@ impl Repository {
         })
     }
 
-    fn ensure_synced(repo: &GitRepository, head: &Reference) -> Result<()> {
+    fn synced_ref(repo: &GitRepository, head: &Reference) -> Result<Ref> {
         if head.is_remote() {
-            return Ok(());
+            return Ok(Ref::Remote(head.name().unwrap().to_string()));
         }
 
         if head.is_branch() {
-            let upstream = match repo
-                .find_branch(head.shorthand().unwrap(), BranchType::Local)?
-                .upstream()
-            {
+            let name = head.shorthand().unwrap();
+            let upstream = match repo.find_branch(name, BranchType::Local)?.upstream() {
                 Ok(b) => b,
                 Err(e) => match e.code() {
                     ErrorCode::NotFound => bail!("Branch has never pushed to remote"),
@@ -91,21 +106,36 @@ impl Repository {
                 },
             };
 
-            if head != &upstream.into_reference() {
+            let reference = upstream.into_reference();
+            if head != &reference {
                 bail!("Branch is not synced");
             }
+
+            Ok(Ref::Branch(BranchRef {
+                name: name.to_string(),
+                remote: repo
+                    .branch_remote_name(reference.name().unwrap())?
+                    .as_str()
+                    .unwrap()
+                    .to_string(),
+            }))
         } else if head.is_tag() {
             bail!("HEAD is a tag");
         } else {
             bail!("Detached HEAD");
         }
-
-        return Ok(());
     }
 }
 
 #[derive(Deserialize, Serialize)]
+pub enum Version {
+    V1,
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct File {
+    pub version: Version,
+
     #[serde(default)]
     pub repositories: Vec<Repository>,
 }
@@ -116,6 +146,7 @@ impl<'a> FromIterator<Path<'a>> for File {
         T: IntoIterator<Item = Path<'a>>,
     {
         Self {
+            version: Version::V1,
             repositories: iter
                 .into_iter()
                 .flat_map(|path| match Repository::save(&path) {
