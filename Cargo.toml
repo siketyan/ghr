@@ -1,12 +1,12 @@
 [package]
 name = "ghr"
 description = "Yet another repository management with auto-attaching profiles."
-version = "0.3.11"
+version = "0.4.0"
 license = "MIT"
 homepage = "https://github.com/siketyan/ghr"
 repository = "https://github.com/siketyan/ghr.git"
 readme = "README.md"
-rust-version = "1.69.0"
+rust-version = "1.75.0"
 edition = "2021"
 authors = [
     "Naoki Ikeguchi <me@s6n.jp>",
@@ -15,7 +15,7 @@ authors = [
 [dependencies]
 anyhow = "1.0"
 async-hofs = "0.1.1"
-async-trait = "0.1.75"
+async-trait = "0.1.76"
 build-info = "0.0.34"
 clap = { version = "4.4", features = ["derive"] }
 console = "0.15.7"
@@ -31,13 +31,13 @@ serde_regex = "1.1"
 serde_with = "3.3"
 tokio = { version = "1.35", features = ["macros", "rt-multi-thread"] }
 tokio-stream = "0.1.14"
-toml = "0.8.3"
+toml = "0.8.8"
 tracing = "0.1.39"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 url = "2.5"
 walkdir = "2.4"
 
-gh-config = { version = "0.3.0", optional = true }
+gh-config = { version = "0.3.1", optional = true }
 octocrab = { version = "0.32.0", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows]
