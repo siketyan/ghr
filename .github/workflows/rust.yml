@@ -119,7 +119,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Log into crates.io
-        run: cargo login '${{ secrets.CRATES_IO_TOKEN }}
+        run: cargo login '${{ secrets.CRATES_IO_TOKEN }}'
 
       - name: Publish to crates.io
         run: cargo publish --allow-dirty
