@@ -59,6 +59,11 @@ impl Repository {
             },
         };
 
+        let remotes = repo.remotes()?;
+        if remotes.is_empty() {
+            bail!("No remotes defined");
+        }
+
         let r#ref = match Self::synced_ref(&repo, &head) {
             Ok(r) => Some(r),
             Err(e) => {
@@ -66,11 +71,6 @@ impl Repository {
                 None
             }
         };
-
-        let remotes = repo.remotes()?;
-        if remotes.is_empty() {
-            bail!("No remotes defined");
-        }
 
         Ok(Self {
             host: path.host.to_string(),
