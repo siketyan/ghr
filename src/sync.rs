@@ -16,7 +16,9 @@ pub struct BranchRef {
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum Ref {
+    #[serde(rename = "remote")]
     Remote(String),
+    #[serde(rename = "branch")]
     Branch(BranchRef),
     // tag is not supported ... yet.
 }
@@ -129,6 +131,7 @@ impl Repository {
 
 #[derive(Deserialize, Serialize)]
 pub enum Version {
+    #[serde(rename = "1")]
     V1,
 }
 
