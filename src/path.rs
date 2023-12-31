@@ -1,14 +1,15 @@
-use crate::root::Root;
-use crate::url::Url;
 use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
+
+use crate::root::Root;
+use crate::url::Url;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Path<'a> {
     root: &'a Root,
-    host: String,
-    owner: String,
-    repo: String,
+    pub host: String,
+    pub owner: String,
+    pub repo: String,
 }
 
 impl<'a> Path<'a> {

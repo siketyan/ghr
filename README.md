@@ -89,6 +89,7 @@ Commands:
   path     Prints the path to root, owner, or a repository
   profile  Manages profiles to use in repositories
   shell    Writes a shell script to extend ghr features
+  sync     Sync repositories between your devices
   version  Prints the version of this application
   help     Print this message or the help of the given subcommand(s)
 

@@ -9,6 +9,7 @@ mod open;
 mod path;
 mod profile;
 mod shell;
+mod sync;
 mod version;
 
 use std::io::stderr;
@@ -42,6 +43,8 @@ pub enum Action {
     Profile(profile::Cmd),
     /// Writes a shell script to extend ghr features.
     Shell(shell::Cmd),
+    /// Sync repositories between your devices.
+    Sync(sync::Cmd),
     /// Prints the version of this application.
     Version(version::Cmd),
 }
@@ -91,6 +94,7 @@ impl Cli {
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),
+            Sync(cmd) => cmd.run(),
             Version(cmd) => cmd.run(),
         }
     }
