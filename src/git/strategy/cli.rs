@@ -4,7 +4,7 @@ use std::process::Command;
 use anyhow::anyhow;
 use tracing::debug;
 
-use crate::git::{CloneOptions, CloneRepository};
+use crate::git::{CheckoutBranch, CloneOptions, CloneRepository, Fetch};
 
 pub struct Cli;
 
@@ -43,6 +43,53 @@ impl CloneRepository for Cli {
             true => Ok(()),
             _ => Err(anyhow!(
                 "Error occurred while cloning the repository: {}",
+                String::from_utf8_lossy(output.stderr.as_slice()).trim(),
+            )),
+        }
+    }
+}
+
+impl Fetch for Cli {
+    fn fetch<P>(&self, path: P, remote: impl Into<String>) -> anyhow::Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let output = Command::new("git")
+            .current_dir(path)
+            .args(["fetch".to_string(), remote.into()])
+            .output()?;
+
+        match output.status.success() {
+            true => Ok(()),
+            _ => Err(anyhow!(
+                "Error occurred while fetching the remote: {}",
+                String::from_utf8_lossy(output.stderr.as_slice()).trim(),
+            )),
+        }
+    }
+}
+
+impl CheckoutBranch for Cli {
+    fn checkout_branch<P>(
+        &self,
+        path: P,
+        branch: impl Into<String>,
+        track: impl Into<Option<String>>,
+    ) -> anyhow::Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let mut args = Vec::from(["checkout".to_string(), "-b".to_string(), branch.into()]);
+        if let Some(t) = track.into() {
+            args.push("--track".to_string());
+            args.push(t);
+        }
+
+        let output = Command::new("git").current_dir(path).args(args).output()?;
+        match output.status.success() {
+            true => Ok(()),
+            _ => Err(anyhow!(
+                "Error occurred while fetching the remote: {}",
                 String::from_utf8_lossy(output.stderr.as_slice()).trim(),
             )),
         }

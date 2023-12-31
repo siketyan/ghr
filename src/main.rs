@@ -9,6 +9,7 @@ mod profile;
 mod repository;
 mod root;
 mod rule;
+mod sync;
 mod url;
 
 use std::process::exit;
