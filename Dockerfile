@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.4
 
-FROM rust:1.74 AS base
+FROM rust:1.75 AS base
 SHELL ["/bin/bash", "-c"]
 WORKDIR /src
 
