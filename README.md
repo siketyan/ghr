@@ -164,7 +164,7 @@ cmd = "code"
 args = ["%p"]
 ```
 
-> **Note**
+> [!NOTE]
 > `%p` will be replaced by the repository path.
 
 ### Finding path of the repository
@@ -176,6 +176,18 @@ ghr path github.com/<owner>/<repo> # Repository directory of the specified host
 ghr path --owner=<owner> # Owner root
 ghr path --host=github.com # Host root
 ghr path --host=github.com --owner=<owner> # Owner root of the specified host
+```
+
+### Syncing repositories and their state
+
+> [!WARNING]
+> This feature is experimental.
+
+ghr supports dumping and restoring the current branch and remotes of managed repositories.
+
+```shell
+ghr sync dump > repositories.toml
+ghr sync restore < repositories.toml
 ```
 
 ## 🛠 Customising
