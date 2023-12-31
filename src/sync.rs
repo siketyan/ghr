@@ -10,7 +10,7 @@ use crate::path::Path;
 #[derive(Deserialize, Serialize)]
 pub struct BranchRef {
     pub name: String,
-    pub remote: String,
+    pub upstream: String,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -108,6 +108,7 @@ impl Repository {
                 },
             };
 
+            let upstream_name = upstream.name()?.unwrap().to_string();
             let reference = upstream.into_reference();
             if head != &reference {
                 bail!("Branch is not synced");
@@ -115,11 +116,7 @@ impl Repository {
 
             Ok(Ref::Branch(BranchRef {
                 name: name.to_string(),
-                remote: repo
-                    .branch_remote_name(reference.name().unwrap())?
-                    .as_str()
-                    .unwrap()
-                    .to_string(),
+                upstream: upstream_name,
             }))
         } else if head.is_tag() {
             bail!("HEAD is a tag");

@@ -83,7 +83,7 @@ impl Cmd {
                     config.git.strategy.checkout.checkout_branch(
                         &path,
                         &b.name,
-                        format!("{}/{}", &b.remote, &b.name),
+                        Some(b.upstream.to_string()),
                     )?;
 
                     info!("Successfully checked out a branch: {}", &b.name);
