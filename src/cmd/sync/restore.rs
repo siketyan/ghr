@@ -8,6 +8,8 @@ use tracing::info;
 
 use crate::cmd::clone;
 use crate::config::Config;
+use crate::console::Spinner;
+use crate::git::{CheckoutBranch, Fetch};
 use crate::path::Path;
 use crate::root::Root;
 use crate::sync::{File, Ref, Repository};
@@ -47,8 +49,8 @@ impl Cmd {
             .run()
             .await?;
 
-            let path = Path::new(&root, host, owner, repo);
-            let repo = GitRepository::open(PathBuf::from(&path))?;
+            let path = PathBuf::from(Path::new(&root, host, owner, repo));
+            let repo = GitRepository::open(&path)?;
 
             for remote in remotes {
                 if let Err(e) = repo
@@ -60,6 +62,15 @@ impl Cmd {
                         _ => return Err(e.into()),
                     }
                 }
+
+                Spinner::new("Fetching objects from remotes...")
+                    .spin_while(|| async {
+                        config.git.strategy.clone.fetch(&path, &remote.name)?;
+                        Ok::<(), anyhow::Error>(())
+                    })
+                    .await?;
+
+                info!("Fetched from remote: {}", &remote.name);
             }
 
             match r#ref {
@@ -69,13 +80,13 @@ impl Cmd {
                     info!("Successfully checked out a remote ref: {}", &r);
                 }
                 Some(Ref::Branch(b)) => {
-                    let (object, reference) = repo.revparse_ext(&b.name)?;
-                    let ref_name = reference.unwrap().name().unwrap().to_string();
+                    config.git.strategy.checkout.checkout_branch(
+                        &path,
+                        &b.name,
+                        format!("{}/{}", &b.remote, &b.name),
+                    )?;
 
-                    repo.checkout_tree(&object, None)?;
-                    repo.set_head(&ref_name)?;
-
-                    info!("Successfully checked out a branch: {}", &ref_name);
+                    info!("Successfully checked out a branch: {}", &b.name);
                 }
                 _ => (),
             }

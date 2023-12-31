@@ -21,3 +21,20 @@ pub trait CloneRepository {
         U: ToString,
         P: AsRef<Path>;
 }
+
+pub trait Fetch {
+    fn fetch<P>(&self, path: P, remote: impl Into<String>) -> Result<()>
+    where
+        P: AsRef<Path>;
+}
+
+pub trait CheckoutBranch {
+    fn checkout_branch<P>(
+        &self,
+        path: P,
+        branch: impl Into<String>,
+        track: impl Into<Option<String>>,
+    ) -> Result<()>
+    where
+        P: AsRef<Path>;
+}
