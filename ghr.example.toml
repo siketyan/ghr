@@ -47,6 +47,12 @@ infer = false
 user.name = "My Working Name"
 user.email = "my_working.email@example.com"
 
+# Adds entries to .git/info/exclude (not .gitignore).
+excludes = [
+    "/.idea/",
+    ".DS_Store",
+]
+
 [applications.vscode]
 # You can open a repository in VS Code using `ghr open <repo> vscode`.
 cmd = "code"

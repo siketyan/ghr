@@ -21,8 +21,8 @@ impl Cmd {
             .ok_or_else(|| anyhow!("Unknown profile: {}", &self.name))?;
 
         let repo = Repository::open_from_env()?;
+        profile.apply(&repo)?;
 
-        profile.apply(&mut repo.config()?)?;
         info!(
             "Attached profile [{}] successfully.",
             style(self.name).bold()
