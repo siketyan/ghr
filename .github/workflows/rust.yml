@@ -125,30 +125,33 @@ jobs:
         run: cargo publish --allow-dirty
 
   brew:
+    runs-on: macos-13
+    if: ${{ github.event_name == 'release' }}
+    needs:
+      - build
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@master
+
+      - name: Tap s6n-jp/tap
+        run: brew tap s6n-jp/tap
+
+      - name: Create a bump PR
+        uses: Homebrew/actions/bump-packages@master
+        with:
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          formulae: s6n-jp/tap/ghr
+
+  scoop:
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'release' }}
     needs:
       - build
     steps:
       - uses: actions/checkout@v4
-
-      - name: Release to Homebrew Tap
-        uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
-        with:
-          path: 'Formula/ghr.rb'
-          assets: |-
-            macos_x86_64=ghr-x86_64-apple-darwin.tar.gz
-            macos_aarch64=ghr-aarch64-apple-darwin.tar.gz
-            linux_x86_64=ghr-x86_64-unknown-linux-gnu.tar.gz
-            linux_aarch64=ghr-aarch64-unknown-linux-gnu.tar.gz
-          message: 'feat(ghr): Release ${{ github.event.release.tag_name }}'
-          template: './resources/formula/ghr.rb.mustache'
-          token: '${{ secrets.HOMEBREW_TAP_TOKEN }}'
-          hash: 'sha256'
-          targetRepo: 'homebrew-tap'
-          branch: 'ghr/${{ github.event.release.tag_name }}'
-          author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
-          committer: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
 
       - name: Release to Scoop Bucket
         uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
