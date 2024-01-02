@@ -27,6 +27,8 @@ const BUILD_INFO: &str = build_info::format!(
     $.timestamp,
 );
 
+const VERSION: &str = build_info::format!("{}", $.crate_info.version);
+
 #[tokio::main]
 async fn main() {
     if let Err(e) = Cli::parse().run().await {
