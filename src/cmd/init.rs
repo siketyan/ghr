@@ -62,7 +62,7 @@ impl Cmd {
         );
 
         if let Some((name, p)) = profile {
-            p.apply(&mut repo.config()?)?;
+            p.apply(&repo)?;
 
             info!("Attached profile [{}] successfully.", style(name).bold());
         }

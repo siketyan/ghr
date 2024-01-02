@@ -1,6 +1,8 @@
 mod config;
 mod strategy;
 
+pub mod exclude;
+
 pub use config::Config;
 
 use std::path::Path;

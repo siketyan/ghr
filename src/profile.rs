@@ -4,7 +4,7 @@ use std::ops::Deref;
 use std::result::Result as StdResult;
 
 use anyhow::Result;
-use git2::Config;
+use git2::Repository;
 use itertools::Itertools;
 use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
@@ -12,6 +12,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use toml::value::Value;
 use toml::Table;
 
+use crate::git::exclude::{File, Node};
 use crate::rule::ProfileRef;
 
 #[derive(Debug, Default)]
@@ -125,12 +126,23 @@ impl<'de> Visitor<'de> for ConfigsVisitor {
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Profile {
+    #[serde(default)]
+    pub excludes: Vec<String>,
     #[serde(default, flatten)]
     pub configs: Configs,
 }
 
 impl Profile {
-    pub fn apply(&self, config: &mut Config) -> Result<()> {
+    pub fn apply(&self, repo: &Repository) -> Result<()> {
+        let path = repo.workdir().unwrap();
+        let mut exclude = File::load(path)?;
+        for value in &self.excludes {
+            exclude.add_or_noop(Node::Exclude(value.to_string()));
+        }
+
+        exclude.save(path)?;
+
+        let mut config = repo.config()?;
         for (key, value) in &self.configs.map {
             config.set_str(key, value)?;
         }

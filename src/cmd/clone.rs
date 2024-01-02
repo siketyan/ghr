@@ -210,7 +210,7 @@ impl Cmd {
 
         let repo = Repository::open(&path)?;
         let profile = if let Some((name, p)) = profile {
-            p.apply(&mut repo.config()?)?;
+            p.apply(&repo)?;
             Some(name.to_string())
         } else {
             None
