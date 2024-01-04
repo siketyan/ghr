@@ -1,7 +1,7 @@
 [package]
 name = "ghr"
 description = "Yet another repository management with auto-attaching profiles."
-version = "0.4.1"
+version = "0.4.2"
 license = "MIT"
 homepage = "https://github.com/siketyan/ghr"
 repository = "https://github.com/siketyan/ghr.git"
