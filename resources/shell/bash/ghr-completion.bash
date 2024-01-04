@@ -43,11 +43,17 @@ __ghr_complete() {
   cword="${COMP_WORDS[COMP_CWORD]}"
 
   if [ "${COMP_CWORD}" = 1 ]; then
-    COMPREPLY=($(__ghr_complete__static "${cword}" --help cd clone delete help init open browse path profile shell version))
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help add browse cd clone delete help init list open path profile shell sync version))
     return 0
   fi
 
   case "${COMP_WORDS[1]}" in
+  add)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
+  browse)
+    COMPREPLY=($(__ghr_complete__repos "${cword}"))
+    ;;
   cd)
     COMPREPLY=($(__ghr_complete__repos "${cword}"))
     ;;
@@ -60,6 +66,9 @@ __ghr_complete() {
   init)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
+  list)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help --no-host --no-owner -p --path))
+    ;;
   open)
     if [ "${COMP_CWORD}" = 2 ]; then
       COMPREPLY=($(__ghr_complete__repos "${cword}" --help))
@@ -67,9 +76,6 @@ __ghr_complete() {
       # Complete a known command to open the repository using
       COMPREPLY=($(compgen -c -- "${cword}"))
     fi
-    ;;
-  browse)
-    COMPREPLY=($(__ghr_complete__repos "${cword}"))
     ;;
   path)
     COMPREPLY=($(__ghr_complete__repos "${cword}"))
@@ -89,6 +95,9 @@ __ghr_complete() {
     ;;
   shell)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
+  sync)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help dump restore))
     ;;
   version)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
