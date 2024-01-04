@@ -14,13 +14,13 @@ So I have rewritten them as simple, in Rust, the robust and modern language toda
 ## 📦 Installation
 ### macOS / Using Homebrew (easy)
 ```shell
-brew install siketyan/tap/ghr
+brew install s6n-jp/tap/ghr
 ```
 
 To upgrade:
 
 ```shell
-brew upgrade siketyan/tap/ghr
+brew upgrade s6n-jp/tap/ghr
 ```
 
 ### Windows / Using scoop (easy)
