@@ -38,7 +38,7 @@ url = "2.5"
 walkdir = "2.4"
 
 gh-config = { version = "0.3.1", optional = true }
-octocrab = { version = "0.33.1", optional = true }
+octocrab = { version = "0.33.3", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows]
 version = "0.52.0"
