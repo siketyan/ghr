@@ -397,11 +397,12 @@ dependencies = [
 
 [[package]]
 name = "build-info"
-version = "0.0.34"
+version = "0.0.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "155eb070980e96aeb4ef3b8620b0febb2ae5e17451dc1b329681bdd4eb0a94e1"
+checksum = "b960dda43575c5097947483b1dd4ab1f4c77cbc5836daea0118ecc417d3f1662"
 dependencies = [
- "build-info-common",
+ "bincode",
+ "build-info-common 0.0.35",
  "build-info-proc",
 ]
 
@@ -414,7 +415,7 @@ dependencies = [
  "anyhow",
  "base64 0.21.5",
  "bincode",
- "build-info-common",
+ "build-info-common 0.0.34",
  "cargo_metadata",
  "chrono",
  "git2",
@@ -422,7 +423,7 @@ dependencies = [
  "pretty_assertions",
  "rustc_version",
  "serde_json",
- "zstd",
+ "zstd 0.12.4",
 ]
 
 [[package]]
@@ -438,15 +439,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "build-info-proc"
-version = "0.0.34"
+name = "build-info-common"
+version = "0.0.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fc1874cb1995691fb01f9bb56e75f9660d2614e74607fa71c08a8b3bd7e30e4"
+checksum = "6324bb106cf978e5a45f5f475c736f92a869e3a54c085ef732b2015801ca5f86"
+dependencies = [
+ "chrono",
+ "derive_more",
+ "semver",
+ "serde",
+]
+
+[[package]]
+name = "build-info-proc"
+version = "0.0.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e690706a5548b5472c81c7b69af8470ec402f2c1b186e8f16df1cbcf1a663eaf"
 dependencies = [
  "anyhow",
  "base64 0.21.5",
  "bincode",
- "build-info-common",
+ "build-info-common 0.0.35",
  "chrono",
  "num-bigint",
  "num-traits",
@@ -455,7 +468,7 @@ dependencies = [
  "quote",
  "serde_json",
  "syn 2.0.47",
- "zstd",
+ "zstd 0.13.0",
 ]
 
 [[package]]
@@ -3359,7 +3372,16 @@ version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a27595e173641171fc74a1232b7b1c7a7cb6e18222c11e9dfb9888fa424c53c"
 dependencies = [
- "zstd-safe",
+ "zstd-safe 6.0.6",
+]
+
+[[package]]
+name = "zstd"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bffb3309596d527cfcba7dfc6ed6052f1d39dfbd7c867aa2e865e4a449c10110"
+dependencies = [
+ "zstd-safe 7.0.0",
 ]
 
 [[package]]
@@ -3369,6 +3391,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee98ffd0b48ee95e6c5168188e44a54550b1564d9d530ee21d5f0eaed1069581"
 dependencies = [
  "libc",
+ "zstd-sys",
+]
+
+[[package]]
+name = "zstd-safe"
+version = "7.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43747c7422e2924c11144d5229878b98180ef8b06cca4ab5af37afc8a8d8ea3e"
+dependencies = [
  "zstd-sys",
 ]
 
