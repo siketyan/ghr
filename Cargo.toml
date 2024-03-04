@@ -49,7 +49,7 @@ features = [
 ]
 
 [build-dependencies]
-build-info-build = "0.0.34"
+build-info-build = "0.0.35"
 
 [features]
 default = ["github"]
