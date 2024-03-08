@@ -5,6 +5,11 @@ updates:
     directory: '/'
     schedule:
       interval: weekly
+    groups:
+      build-info:
+        patterns:
+          - build-info
+          - build-info-build
 
   - package-ecosystem: docker
     directory: '/'
