@@ -1044,11 +1044,11 @@ dependencies = [
 
 [[package]]
 name = "gh-config"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d483ec069b462dfe2bb1c0c446e5a9878502167bfb68d109afb2669570dd6789"
+checksum = "6038ebf9f1bd6e6e935e6d77a5c2daded71668a89b307b7faf8f0257327f851f"
 dependencies = [
- "base64 0.21.5",
+ "base64 0.22.0",
  "dirs",
  "hex",
  "secret-service",
@@ -1056,7 +1056,7 @@ dependencies = [
  "serde",
  "serde_yaml",
  "thiserror",
- "windows 0.52.0",
+ "windows",
 ]
 
 [[package]]
@@ -1089,7 +1089,7 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "walkdir",
- "windows 0.54.0",
+ "windows",
 ]
 
 [[package]]
@@ -3069,30 +3069,11 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "windows"
-version = "0.52.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e48a53791691ab099e5e2ad123536d0fff50652600abaf43bbf952894110d0be"
-dependencies = [
- "windows-core 0.52.0",
- "windows-targets 0.52.3",
-]
-
-[[package]]
-name = "windows"
 version = "0.54.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9252e5725dbed82865af151df558e754e4a3c2c30818359eb17465f1346a1b49"
 dependencies = [
  "windows-core 0.54.0",
- "windows-targets 0.52.3",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.52.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
-dependencies = [
  "windows-targets 0.52.3",
 ]
 
