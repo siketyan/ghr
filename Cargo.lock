@@ -1089,7 +1089,6 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "walkdir",
- "windows",
 ]
 
 [[package]]
