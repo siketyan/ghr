@@ -14,6 +14,8 @@ fn open_url(url: &url::Url) -> Result<()> {
     use windows::Win32::UI::Shell::ShellExecuteA;
     use windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD;
 
+    // https://github.com/pkg/browser/issues/16
+    // https://github.com/cli/browser/commit/28dca726a60e5e7cdf0326436aa1cb4d476c3305
     // https://web.archive.org/web/20150421233040/https://support.microsoft.com/en-us/kb/224816
     unsafe {
         ShellExecuteA(
@@ -33,18 +35,37 @@ fn open_url(url: &url::Url) -> Result<()> {
 fn open_url(url: &url::Url) -> Result<()> {
     std::process::Command::new("open")
         .arg(url.to_string())
-        .spawn()?;
+        .spawn()?
+        .wait()?;
 
     Ok(())
 }
 
 #[cfg(all(not(windows), not(target_os = "macos")))]
 fn open_url(url: &url::Url) -> Result<()> {
-    std::process::Command::new("xdg-open")
-        .arg(url.to_string())
-        .spawn()?;
+    // c.f. https://github.com/cli/browser/blob/main/browser_linux.go
+    let commands = ["xdg-open", "x-www-browser", "www-browser", "wslview"];
 
-    Ok(())
+    for command in commands {
+        match std::process::Command::new(command)
+            .arg(url.to_string())
+            .spawn()
+        {
+            Ok(mut child) => {
+                child.wait()?;
+                return Ok(());
+            }
+            Err(e) => match e.kind() {
+                std::io::ErrorKind::NotFound => continue,
+                _ => return Err(e.into()),
+            },
+        }
+    }
+
+    let commands = commands.join(", ");
+    Err(anyhow!(
+        "Command not found: you need one of the following commands to open a url: {commands}"
+    ))
 }
 
 #[derive(Debug, Parser)]
