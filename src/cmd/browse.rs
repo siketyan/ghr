@@ -27,7 +27,8 @@ fn open_url(url: &url::Url) -> Result<()> {
 fn open_url(url: &url::Url) -> Result<()> {
     std::process::Command::new("open")
         .arg(url.to_string())
-        .spawn()?;
+        .spawn()?
+        .wait()?;
 
     Ok(())
 }
