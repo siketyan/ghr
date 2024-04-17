@@ -34,11 +34,26 @@ fn open_url(url: &url::Url) -> Result<()> {
 
 #[cfg(all(not(windows), not(target_os = "macos")))]
 fn open_url(url: &url::Url) -> Result<()> {
-    std::process::Command::new("xdg-open")
-        .arg(url.to_string())
-        .spawn()?;
+    // c.f. https://github.com/cli/browser/blob/main/browser_linux.go
+    let commands = ["xdg-open", "x-www-browser", "www-browser", "wslview"];
 
-    Ok(())
+    for command in commands {
+        match std::process::Command::new(command)
+            .arg(url.to_string())
+            .spawn()
+        {
+            Ok(mut child) => {
+                child.wait()?;
+                return Ok(());
+            }
+            Err(e) => match e.kind() {
+                std::io::ErrorKind::NotFound => continue,
+                _ => return Err(e.into()),
+            },
+        }
+    }
+
+    Err(anyhow!("no commands were found to open the url"))
 }
 
 #[derive(Debug, Parser)]
