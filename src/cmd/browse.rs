@@ -62,7 +62,10 @@ fn open_url(url: &url::Url) -> Result<()> {
         }
     }
 
-    Err(anyhow!("no commands were found to open the url"))
+    let commands = commands.join(", ");
+    Err(anyhow!(
+        "Command not found: you need one of the following commands to open a url: {commands}"
+    ))
 }
 
 #[derive(Debug, Parser)]
