@@ -7,24 +7,18 @@ use crate::url::Url;
 
 #[cfg(windows)]
 fn open_url(url: &url::Url) -> Result<()> {
-    use std::ffi::CString;
-
-    use windows::core::{s, PCSTR};
-    use windows::Win32::Foundation::HWND;
-    use windows::Win32::UI::Shell::ShellExecuteA;
-    use windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD;
-
-    // https://web.archive.org/web/20150421233040/https://support.microsoft.com/en-us/kb/224816
-    unsafe {
-        ShellExecuteA(
-            HWND::default(),
-            s!("open"),
-            PCSTR::from_raw(CString::new(url.to_string().as_str())?.as_ptr() as *const u8),
-            PCSTR::null(),
-            PCSTR::null(),
-            SHOW_WINDOW_CMD(0),
-        );
-    }
+    // Use start command to open a url.
+    // start invokes explorer.exe inside when a path is given,
+    // which will open the default web browser if a url is given.
+    //
+    // explorer.exe seems to not work properly on WSL so we don't invoke it directly
+    // c.f. https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/start
+    // c.f. https://ss64.com/nt/explorer.html
+    // c.f. https://github.com/microsoft/WSL/issues/3832
+    std::process::Command::new("cmd.exe")
+        .args(["/c", "start", &url.to_string()])
+        .spawn()?
+        .wait()?;
 
     Ok(())
 }
