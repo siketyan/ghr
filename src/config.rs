@@ -5,7 +5,6 @@ use anyhow::Result;
 use serde::Deserialize;
 
 use crate::application::Applications;
-use crate::git::Config as GitConfig;
 use crate::platform::Config as PlatformConfig;
 use crate::profile::Profiles;
 use crate::root::Root;
@@ -21,8 +20,6 @@ pub struct Defaults {
 pub struct Config {
     #[serde(default)]
     pub defaults: Defaults,
-    #[serde(default)]
-    pub git: GitConfig,
     #[serde(default)]
     pub platforms: PlatformConfig,
     #[serde(default)]

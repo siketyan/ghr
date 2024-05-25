@@ -13,7 +13,7 @@ use tracing::{info, warn};
 
 use crate::config::Config;
 use crate::console::{MultiSpinner, Spinner};
-use crate::git::{CloneOptions, CloneRepository};
+use crate::git::{clone_repository, CloneOptions};
 use crate::path::Path;
 use crate::root::Root;
 use crate::url::Url;
@@ -185,7 +185,7 @@ impl Cmd {
             warn!("Directory already exists. Skipping cloning the repository...");
         } else {
             let mut retries = 0;
-            while let Err(e) = config.git.strategy.clone.clone_repository(
+            while let Err(e) = clone_repository(
                 url.clone(),
                 &path,
                 &CloneOptions {

@@ -9,7 +9,7 @@ use tracing::info;
 use crate::cmd::clone;
 use crate::config::Config;
 use crate::console::Spinner;
-use crate::git::{CheckoutBranch, Fetch};
+use crate::git::{checkout_branch, fetch};
 use crate::path::Path;
 use crate::root::Root;
 use crate::sync::{File, Ref, Repository};
@@ -65,7 +65,7 @@ impl Cmd {
 
                 Spinner::new("Fetching objects from remotes...")
                     .spin_while(|| async {
-                        config.git.strategy.clone.fetch(&path, &remote.name)?;
+                        fetch(&path, &remote.name)?;
                         Ok::<(), anyhow::Error>(())
                     })
                     .await?;
@@ -80,11 +80,7 @@ impl Cmd {
                     info!("Successfully checked out a remote ref: {}", &r);
                 }
                 Some(Ref::Branch(b)) => {
-                    config.git.strategy.checkout.checkout_branch(
-                        &path,
-                        &b.name,
-                        Some(b.upstream.to_string()),
-                    )?;
+                    checkout_branch(&path, &b.name, Some(b.upstream.to_string()))?;
 
                     info!("Successfully checked out a branch: {}", &b.name);
                 }
