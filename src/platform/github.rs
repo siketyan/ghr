@@ -1,6 +1,6 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use async_trait::async_trait;
-use gh_config::{Hosts, GITHUB_COM};
+use gh_config::{is_enterprise, retrieve_token_from_env, retrieve_token_secure, Hosts, GITHUB_COM};
 use octocrab::Octocrab;
 use serde::Deserialize;
 
@@ -34,13 +34,28 @@ impl PlatformInit for GitHub {
     type Config = Config;
 
     fn init(config: &Config) -> Result<Self> {
-        let token = Hosts::load()?
-            .retrieve_token(&config.host)?
-            .ok_or_else(|| {
-                anyhow!(
-                    "gh CLI does not have any token for github.com. Run `gh auth login` and retry."
-                )
-            })?;
+        // Try to load ~/.config/gh/hosts.yml if exists.
+        let hosts = match Hosts::load() {
+            Ok(h) => Some(h),
+            Err(gh_config::Error::Io(_)) => None,
+            Err(e) => return Err(e).context("Could not read the configuration of gh CLI."),
+        };
+
+        let host = config.host.as_str();
+        let token = match hosts {
+            // If the hosts.yml exists, retrieve token from the env, hosts.yml, or secure storage.
+            Some(h) => h.retrieve_token(host)?,
+            // Otherwise, retrieve token from the env or secure storage, skipping hosts.yml.
+            _ => match retrieve_token_from_env(is_enterprise(host)) {
+                Some(t) => Some(t),
+                _ => retrieve_token_secure(host)?,
+            },
+        };
+
+        let token = match token {
+            Some(t) => t,
+            _ => bail!("GitHub access token could not be found. Install the gh CLI and login, or provide an token as GH_TOKEN environment variable."),
+        };
 
         let mut builder = Octocrab::builder().personal_token(token);
         if config.host != GITHUB_COM {

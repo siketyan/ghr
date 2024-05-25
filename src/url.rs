@@ -1,4 +1,5 @@
 use std::convert::Infallible;
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use anyhow::{anyhow, Error, Result};
@@ -223,10 +224,10 @@ impl FromStr for Vcs {
     }
 }
 
-impl ToString for Vcs {
-    fn to_string(&self) -> String {
+impl Display for Vcs {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Git => "git".to_string(),
+            Self::Git => write!(f, "git"),
         }
     }
 }
@@ -250,13 +251,12 @@ impl FromStr for Scheme {
     }
 }
 
-impl ToString for Scheme {
-    fn to_string(&self) -> String {
+impl Display for Scheme {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Https => "https",
-            Self::Ssh => "ssh",
+            Self::Https => write!(f, "https"),
+            Self::Ssh => write!(f, "ssh"),
         }
-        .to_string()
     }
 }
 
@@ -278,11 +278,11 @@ impl FromStr for Host {
     }
 }
 
-impl ToString for Host {
-    fn to_string(&self) -> String {
+impl Display for Host {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::GitHub => GITHUB_COM.to_string(),
-            Self::Unknown(s) => s.clone(),
+            Self::GitHub => write!(f, "{}", GITHUB_COM),
+            Self::Unknown(s) => write!(f, "{}", s),
         }
     }
 }
@@ -374,20 +374,21 @@ impl Url {
     }
 }
 
-impl ToString for Url {
-    fn to_string(&self) -> String {
+impl Display for Url {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if let Some(r) = &self.raw {
-            return r.to_string();
+            return write!(f, "{}", r);
         }
 
         let authority = match &self.user {
-            Some(u) => format!("{}@{}", u, self.host.to_string()),
+            Some(u) => format!("{}@{}", u, &self.host),
             _ => self.host.to_string(),
         };
 
         match self.scheme {
             Scheme::Https => {
-                format!(
+                write!(
+                    f,
                     "https://{}/{}/{}{}",
                     authority,
                     self.owner,
@@ -396,7 +397,8 @@ impl ToString for Url {
                 )
             }
             Scheme::Ssh => {
-                format!(
+                write!(
+                    f,
                     "{}:{}/{}{}",
                     authority,
                     self.owner,

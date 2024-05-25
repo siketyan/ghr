@@ -37,7 +37,7 @@ tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 url = "2.5"
 walkdir = "2.5"
 
-gh-config = { version = "0.3.2", optional = true }
+gh-config = { version = "0.4.0", optional = true }
 octocrab = { version = "0.38.0", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows]
