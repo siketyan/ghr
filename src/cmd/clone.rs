@@ -165,10 +165,10 @@ impl Cmd {
             let root = Arc::clone(&root);
             let config = Arc::clone(&config);
 
-            spinner = spinner.with_spin_while(
-                format!("Cloning from {}...", url.to_string()),
-                move || async move { this.as_ref().clone(&root, &config, url).await },
-            );
+            spinner = spinner
+                .with_spin_while(format!("Cloning from {}...", &url), move || async move {
+                    this.as_ref().clone(&root, &config, url).await
+                });
         }
 
         Ok(spinner.collect().await?.into_iter().collect())
