@@ -3,6 +3,7 @@ use std::path::Path;
 
 use anyhow::Result;
 use serde::Deserialize;
+use tracing::warn;
 
 use crate::application::Applications;
 use crate::platform::Config as PlatformConfig;
@@ -17,9 +18,18 @@ pub struct Defaults {
 }
 
 #[derive(Debug, Default, Deserialize)]
+pub struct SearchPath {
+    #[serde(default)]
+    pub owner: Vec<String>,
+}
+
+#[derive(Debug, Default, Deserialize)]
 pub struct Config {
     #[serde(default)]
+    #[deprecated(since = "0.5.0", note = "Use search_path instead.")]
     pub defaults: Defaults,
+    #[serde(default)]
+    pub search_path: SearchPath,
     #[serde(default)]
     pub platforms: PlatformConfig,
     #[serde(default)]
@@ -52,7 +62,18 @@ impl Config {
     }
 
     fn load_from_str(s: &str) -> Result<Self> {
-        Ok(toml::from_str::<Self>(s)?.with_defaults())
+        let mut config = toml::from_str::<Self>(s)?;
+        #[allow(deprecated)]
+        if let Some(default_owner) = &config.defaults.owner {
+            warn!("Section [defaults] in config is deprecated. Use [search_path] instead.");
+
+            config
+                .search_path
+                .owner
+                .insert(0, default_owner.to_string());
+        }
+
+        Ok(config.with_defaults())
     }
 
     fn with_defaults(mut self) -> Self {

@@ -1,15 +1,16 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use clap::Parser;
 
 use crate::config::Config;
+use crate::git::repository_exists;
 use crate::root::Root;
-use crate::url::Url;
+use crate::url::{PartialUrl, Url};
 
 #[cfg(windows)]
 fn open_url(url: &url::Url) -> Result<()> {
     use std::ffi::CString;
 
-    use windows::core::{s, PCSTR};
+    use windows::core::{PCSTR, s};
     use windows::Win32::Foundation::HWND;
     use windows::Win32::UI::Shell::ShellExecuteA;
     use windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD;
@@ -79,11 +80,23 @@ impl Cmd {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
-        let url = Url::from_str(
-            &self.repo,
-            &config.patterns,
-            config.defaults.owner.as_deref(),
-        )?;
+        let url = PartialUrl::from_str(&self.repo, &config.patterns)?;
+        let url = config
+            .search_path
+            .owner
+            .iter()
+            .map(|default_owner| Url::from_partial(&url, Some(default_owner)).unwrap())
+            .find_map(|u| match repository_exists(&u) {
+                Ok(true) => Some(Ok(u)),
+                Ok(false) => None,
+                Err(e) => Some(Err(e)),
+            });
+
+        let url = match url {
+            Some(Ok(u)) => u,
+            Some(Err(e)) => return Err(e),
+            _ => bail!("Could not find the repository on the remote. Check your search_path config and the repository exists.")
+        };
 
         let platform = config
             .platforms

@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use anyhow::{anyhow, Error, Result};
+use anyhow::{anyhow, bail, Error, Result};
 use itertools::FoldWhile;
 use itertools::Itertools;
 use lazy_static::lazy_static;
@@ -197,12 +197,12 @@ pub enum Vcs {
 }
 
 impl Vcs {
-    fn from_url(url: &url::Url) -> Self {
+    fn from_url(url: &url::Url) -> Option<Self> {
         let url = url.as_str();
         if url.ends_with(GIT_EXTENSION) {
-            Self::Git
+            Some(Self::Git)
         } else {
-            Default::default()
+            None
         }
     }
 
@@ -288,19 +288,19 @@ impl Display for Host {
 }
 
 #[derive(Debug, Default, Eq, PartialEq, Clone)]
-pub struct Url {
-    pub vcs: Vcs,
-    pub scheme: Scheme,
+pub struct PartialUrl {
+    pub vcs: Option<Vcs>,
+    pub scheme: Option<Scheme>,
     pub user: Option<String>,
-    pub host: Host,
-    pub owner: String,
+    pub host: Option<Host>,
+    pub owner: Option<String>,
     pub repo: String,
     pub raw: Option<String>,
 }
 
-impl Url {
-    pub fn from_str(s: &str, p: &Patterns, default_owner: Option<&str>) -> Result<Self> {
-        Self::from_pattern(s, p, default_owner).or_else(|e| match s.contains("://") {
+impl PartialUrl {
+    pub fn from_str(s: &str, p: &Patterns) -> Result<Self> {
+        Self::from_pattern(s, p).or_else(|e| match s.contains("://") {
             true => Self::from_url(&url::Url::from_str(s)?),
             _ => Err(e),
         })
@@ -315,19 +315,16 @@ impl Url {
 
         Ok(Self {
             vcs: Vcs::from_url(url),
-            scheme,
+            scheme: Some(scheme),
             user: match url.username().is_empty() {
                 true => None,
                 _ => Some(url.username().to_string()),
             },
-            host: Host::from_str(
-                url.host_str()
-                    .ok_or_else(|| anyhow!("Could not find hostname from the URL: {}", url))?,
-            )?,
-            owner: segments
-                .next()
-                .ok_or_else(|| anyhow!("Could not find owner from the URL: {}", url))?
-                .to_string(),
+            host: match url.host_str() {
+                Some(h) => Some(Host::from_str(h)?),
+                _ => None,
+            },
+            owner: segments.next().map(|s| s.to_string()),
             repo: Self::remove_extensions(
                 segments.next().ok_or_else(|| {
                     anyhow!("Could not find repository name from the URL: {}", url)
@@ -342,21 +339,21 @@ impl Url {
         })
     }
 
-    fn from_match(m: Match, default_owner: Option<&str>) -> Option<Self> {
+    fn from_match(m: Match) -> Option<Self> {
         Some(Self {
-            vcs: m.vcs.unwrap_or_default(),
-            scheme: m.scheme.unwrap_or_default(),
+            vcs: m.vcs,
+            scheme: m.scheme,
             user: m.user,
-            host: m.host.unwrap_or_default(),
-            owner: m.owner.or_else(|| default_owner.map(|s| s.to_string()))?,
+            host: m.host,
+            owner: m.owner,
             repo: Self::remove_extensions(&m.repo),
             raw: m.raw,
         })
     }
 
-    fn from_pattern(s: &str, p: &Patterns, default_owner: Option<&str>) -> Result<Self> {
+    fn from_pattern(s: &str, p: &Patterns) -> Result<Self> {
         p.matches(s)
-            .and_then(|m| Self::from_match(m, default_owner))
+            .and_then(|m| Self::from_match(m))
             .ok_or(anyhow!("The input did not match any pattern: {}", s))
     }
 
@@ -371,6 +368,37 @@ impl Url {
                 }
             })
             .into_inner()
+    }
+}
+
+#[derive(Debug, Default, Eq, PartialEq, Clone)]
+pub struct Url {
+    pub vcs: Vcs,
+    pub scheme: Scheme,
+    pub user: Option<String>,
+    pub host: Host,
+    pub owner: String,
+    pub repo: String,
+    pub raw: Option<String>,
+}
+
+impl Url {
+    pub fn from_partial(p: &PartialUrl, default_owner: Option<&str>) -> Result<Self> {
+        Ok(Self {
+            vcs: p.vcs.unwrap_or_default(),
+            scheme: p.scheme.unwrap_or_default(),
+            user: p.user.clone(),
+            host: p.host.clone().unwrap_or_default(),
+            owner: match &p.owner {
+                Some(o) => o.to_string(),
+                _ => match default_owner {
+                    Some(d) => d.to_string(),
+                    _ => bail!("Repository owner is not specified in the URL or pattern, and the default owner is not configured.")
+                }
+            },
+            repo: p.repo.clone(),
+            raw: p.raw.clone(),
+        })
     }
 }
 

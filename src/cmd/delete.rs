@@ -1,7 +1,7 @@
 use std::future::ready;
 use std::path::PathBuf;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::Parser;
 use console::style;
 use dialoguer::Confirm;
@@ -11,7 +11,7 @@ use crate::config::Config;
 use crate::console::Spinner;
 use crate::path::Path;
 use crate::root::Root;
-use crate::url::Url;
+use crate::url::{PartialUrl, Url};
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
@@ -35,8 +35,15 @@ impl Cmd {
         }
 
         for repo in self.repo.iter() {
-            let url = Url::from_str(repo, &config.patterns, config.defaults.owner.as_deref())?;
-            let path = PathBuf::from(Path::resolve(&root, &url));
+            let url = PartialUrl::from_str(repo, &config.patterns)?;
+            let path = config
+                .search_path
+                .owner
+                .iter()
+                .map(|default_owner| Url::from_partial(&url, Some(default_owner)).unwrap())
+                .map(|u| PathBuf::from(Path::resolve(&root, &u)))
+                .find(|p| p.exists())
+                .ok_or_else(|| anyhow!("The repository does not exist on the filesystem."))?;
 
             Spinner::new("Deleting the repository...")
                 .spin_while(|| ready(std::fs::remove_dir_all(&path).map_err(anyhow::Error::from)))

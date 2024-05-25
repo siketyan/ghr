@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use async_hofs::iter::AsyncMapExt;
 use clap::Parser;
 use console::style;
@@ -13,10 +13,10 @@ use tracing::{info, warn};
 
 use crate::config::Config;
 use crate::console::{MultiSpinner, Spinner};
-use crate::git::{clone_repository, CloneOptions};
+use crate::git::{clone_repository, CloneOptions, repository_exists};
 use crate::path::Path;
 use crate::root::Root;
-use crate::url::Url;
+use crate::url::{PartialUrl, Url};
 
 // Constant values taken from implementation of GitHub Cli (gh)
 // ref: https://github.com/cli/cli/blob/350011/pkg/cmd/repo/fork/fork.go#L328-L344
@@ -109,10 +109,26 @@ impl Cmd {
     }
 
     async fn url(&self, config: &Config, repo: &str) -> Result<Url> {
-        let mut url = Url::from_str(repo, &config.patterns, config.defaults.owner.as_deref())?;
+        let url = PartialUrl::from_str(repo, &config.patterns)?;
+        let url = config
+            .search_path
+            .owner
+            .iter()
+            .map(|default_owner| Url::from_partial(&url, Some(default_owner)).unwrap())
+            .find_map(|u| match repository_exists(&u) {
+                Ok(true) => Some(Ok(u)),
+                Ok(false) => None,
+                Err(e) => Some(Err(e)),
+            });
+
+        let mut url = match url {
+            Some(Ok(u)) => u,
+            Some(Err(e)) => return Err(e),
+            _ => bail!("Could not find the repository on the remote. Check your search_path config and the repository exists.")
+        };
 
         if let Some(owner) = &self.fork {
-            info!("Forking from '{}'", url.to_string());
+            info!("Forking from '{}'", &url);
 
             let platform = config
                 .platforms
@@ -120,10 +136,12 @@ impl Cmd {
                 .ok_or_else(|| anyhow!("Could not find a platform to fork on."))?
                 .try_into_platform()?;
 
-            url = Url::from_str(
-                &platform.fork(&url, owner.clone()).await?,
-                &config.patterns,
-                config.defaults.owner.as_deref(),
+            url = Url::from_partial(
+                &PartialUrl::from_str(
+                    &platform.fork(&url, owner.clone()).await?,
+                    &config.patterns,
+                )?,
+                None,
             )?;
         }
 
