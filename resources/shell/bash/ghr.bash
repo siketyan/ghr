@@ -27,6 +27,15 @@ __ghr_remove() {
 }
 
 ghr() {
+    local arg
+
+    for arg in "$@"; do
+      if [ "$arg" = '-h' ] || [ "$arg" = '--help' ]; then
+        $__GHR $@
+        return
+      fi
+    done
+
     if [ "$#" -gt 1 ]; then
         if [ "$1" = "cd" ]; then
             __ghr_cd ${@:2}
