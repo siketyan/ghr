@@ -1,3 +1,10 @@
+use std::io::stderr;
+
+use anyhow::Result;
+use clap::{Parser, Subcommand};
+use tracing_subscriber::filter::LevelFilter;
+use tracing_subscriber::EnvFilter;
+
 mod add;
 mod browse;
 mod cd;
@@ -8,16 +15,10 @@ mod list;
 mod open;
 mod path;
 mod profile;
+mod search;
 mod shell;
 mod sync;
 mod version;
-
-use std::io::stderr;
-
-use anyhow::Result;
-use clap::{Parser, Subcommand};
-use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::EnvFilter;
 
 #[derive(Debug, Subcommand)]
 pub enum Action {
@@ -41,6 +42,8 @@ pub enum Action {
     Path(path::Cmd),
     /// Manages profiles to use in repositories.
     Profile(profile::Cmd),
+    /// Perform a fuzzy search on the repositories list.
+    Search(search::Cmd),
     /// Writes a shell script to extend ghr features.
     Shell(shell::Cmd),
     /// Sync repositories between your devices.
@@ -93,6 +96,7 @@ impl Cli {
             Browse(cmd) => cmd.run().await,
             Path(cmd) => cmd.run(),
             Profile(cmd) => cmd.run(),
+            Search(cmd) => cmd.run(),
             Shell(cmd) => cmd.run(),
             Sync(cmd) => cmd.run().await,
             Version(cmd) => cmd.run(),
