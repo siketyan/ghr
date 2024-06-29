@@ -65,7 +65,7 @@ impl Cmd {
 
                 Spinner::new("Fetching objects from remotes...")
                     .spin_while(|| async {
-                        config.git.strategy.clone.fetch(&path, &remote.name)?;
+                        config.git.strategy.fetch.fetch(&path, &remote.name)?;
                         Ok::<(), anyhow::Error>(())
                     })
                     .await?;
