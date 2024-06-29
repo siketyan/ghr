@@ -3,10 +3,11 @@ function __fish_is_arg_n --argument-names n
 end
 
 function __ghr_complete_repos
-    if test $query = ''
+    set query (commandline -ct)
+    if test "$query" = ''
         ghr list
     else
-        ghr search (commandline -ct)
+        ghr search "$query"
     end
 end
 
