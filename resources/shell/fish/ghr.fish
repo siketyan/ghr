@@ -15,6 +15,11 @@ function __ghr_cd
 end
 
 function ghr
+    if contains -- "--help" $argv[1..]; or contains -- "-h" $argv[1..]
+        command ghr $argv[1..]
+        return 0
+    end
+
     if test "$argv[1]" = "cd"
         __ghr_cd $argv[2..]
         return 0
