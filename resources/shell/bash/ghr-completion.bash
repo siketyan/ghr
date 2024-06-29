@@ -13,7 +13,11 @@ __ghr_complete__repos() {
     return
   fi
 
-  ghr search "$1"
+  if [ "$1" = '' ]; then
+    ghr list
+  else
+    ghr search "$1"
+  fi
 }
 
 __ghr_complete__profiles() {
