@@ -9,16 +9,11 @@ __ghr_complete__static() {
 }
 
 __ghr_complete__repos() {
-  local repositories suggestions
-
-  repositories="$(ghr list)"
-  suggestions="$(compgen -W "${repositories[*]}" -- "$1")"
-
   if [[ $1 != -* && ${COMP_CWORD} -ne 2 ]]; then
     return
   fi
 
-  echo "$suggestions"
+  ghr search "$1"
 }
 
 __ghr_complete__profiles() {
@@ -92,6 +87,9 @@ __ghr_complete() {
         ;;
       esac
     fi
+    ;;
+  search)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
   shell)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))

@@ -16,6 +16,7 @@ complete -c ghr -n "__fish_is_arg_n 1" -a list -d "Lists all managed repositorie
 complete -c ghr -n "__fish_is_arg_n 1" -a open -d "Opens a repository in an application"
 complete -c ghr -n "__fish_is_arg_n 1" -a path -d "Prints the path to root, owner, or a repository"
 complete -c ghr -n "__fish_is_arg_n 1" -a profile -d "Manages profiles to use in repositories"
+complete -c ghr -n "__fish_is_arg_n 1" -a search -d "Perform a fuzzy search on the repositories list"
 complete -c ghr -n "__fish_is_arg_n 1" -a shell -d "Writes a shell script to extend ghr features"
 complete -c ghr -n "__fish_is_arg_n 1" -a sync -d "Sync repositories between your devices"
 complete -c ghr -n "__fish_is_arg_n 1" -a version -d "Prints the version of this application"
@@ -24,7 +25,7 @@ complete -c ghr -n "__fish_is_arg_n 1" -a version -d "Prints the version of this
 complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from add" -f
 
 # Complete the 2nd argument of cd, delete, path, open, and browse commands using the repository list
-complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from browse cd delete path open" -a "(ghr list)"
+complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from browse cd delete path open" -a "(ghr search (commandline -ct))"
 
 # Complete the 3rd argument of open command using the known command list
 complete -c ghr -n "__fish_is_arg_n 3; and __fish_seen_subcommand_from open" -a "(complete -C '')"
