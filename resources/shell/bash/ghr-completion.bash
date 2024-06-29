@@ -93,6 +93,9 @@ __ghr_complete() {
       esac
     fi
     ;;
+  search)
+    COMPREPLY=($(__ghr_complete__static "${cword}" --help))
+    ;;
   shell)
     COMPREPLY=($(__ghr_complete__static "${cword}" --help))
     ;;
