@@ -25,7 +25,7 @@ complete -c ghr -n "__fish_is_arg_n 1" -a version -d "Prints the version of this
 complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from add" -f
 
 # Complete the 2nd argument of cd, delete, path, open, and browse commands using the repository list
-complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from browse cd delete path open" -a "(ghr list)"
+complete -c ghr -n "__fish_is_arg_n 2; and __fish_seen_subcommand_from browse cd delete path open" -a "(ghr search (commandline -ct))"
 
 # Complete the 3rd argument of open command using the known command list
 complete -c ghr -n "__fish_is_arg_n 3; and __fish_seen_subcommand_from open" -a "(complete -C '')"
