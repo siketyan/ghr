@@ -1,5 +1,6 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use clap::Parser;
+use git2::Repository;
 
 use crate::config::Config;
 use crate::root::Root;
@@ -71,7 +72,8 @@ fn open_url(url: &url::Url) -> Result<()> {
 #[derive(Debug, Parser)]
 pub struct Cmd {
     /// URL or pattern of the repository to be browsed.
-    repo: String,
+    /// Defaults to the default remote of the repository at the current directory.
+    repo: Option<String>,
 }
 
 impl Cmd {
@@ -79,11 +81,26 @@ impl Cmd {
         let root = Root::find()?;
         let config = Config::load_from(&root)?;
 
-        let url = Url::from_str(
-            &self.repo,
-            &config.patterns,
-            config.defaults.owner.as_deref(),
-        )?;
+        let url = match self.repo.as_deref() {
+            Some(path) => path.to_owned(),
+            _ => {
+                let repo = Repository::open_from_env()?;
+
+                let remotes = repo.remotes()?;
+                let remote = match remotes.iter().flatten().next() {
+                    Some(r) => r.to_owned(),
+                    _ => bail!("The repository has no remote."),
+                };
+
+                let remote = repo.find_remote(&remote)?;
+                match remote.url() {
+                    Some(url) => url.to_string(),
+                    _ => bail!("Could not find the remote URL from the repository."),
+                }
+            }
+        };
+
+        let url = Url::from_str(&url, &config.patterns, config.defaults.owner.as_deref())?;
 
         let platform = config
             .platforms
