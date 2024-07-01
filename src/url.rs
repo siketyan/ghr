@@ -5,7 +5,6 @@ use std::str::FromStr;
 use anyhow::{anyhow, Error, Result};
 use itertools::FoldWhile;
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use regex::Regex;
 use serde::Deserialize;
 use serde_with::DeserializeFromStr;
@@ -14,6 +13,29 @@ const GITHUB_COM: &str = "github.com";
 
 const GIT_EXTENSION: &str = ".git";
 const EXTENSIONS: &[&str] = &[GIT_EXTENSION];
+
+macro_rules! lazy_static {
+    ($(static ref $name:ident : $ty:ty = $value:expr ;)*) => {
+        $(
+            #[doc(hidden)]
+            #[allow(dead_code, non_camel_case_types, clippy::upper_case_acronyms)]
+            struct $name { __private: () }
+
+            impl ::std::ops::Deref for $name {
+                type Target = $ty;
+
+                fn deref(&self) -> &Self::Target {
+                    use std::sync::OnceLock;
+                    static LAZY: OnceLock<$ty> = OnceLock::new();
+                    LAZY.get_or_init(|| $value)
+                }
+            }
+
+            #[allow(non_camel_case_types)]
+            const $name: $name = $name { __private: () };
+        )*
+    };
+}
 
 lazy_static! {
     static ref SSH: Pattern = Pattern::from(

@@ -1072,7 +1072,6 @@ dependencies = [
  "git2",
  "indicatif",
  "itertools",
- "lazy_static",
  "nucleo-matcher",
  "octocrab",
  "regex",
