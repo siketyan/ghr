@@ -24,7 +24,6 @@ dirs = "5.0"
 git2 = "0.19.0"
 itertools = "0.13.0"
 indicatif = "0.17.8"
-lazy_static = "1.5"
 nucleo-matcher = "0.3.1"
 regex = "1.10"
 serde = { version = "1.0", features = ["derive"] }
