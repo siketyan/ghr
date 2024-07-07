@@ -1,12 +1,13 @@
 use anyhow::Result;
 use clap::Parser;
 use itertools::Itertools;
-use nucleo_matcher::{Config, Matcher, Utf32Str};
+use nucleo_matcher::pattern::{AtomKind, CaseMatching, Normalization, Pattern};
+use nucleo_matcher::{Config, Matcher};
 
 use crate::repository::Repositories;
 use crate::root::Root;
 
-const MIN_SCORE: u16 = 50;
+const MIN_SCORE: u32 = 50;
 
 #[derive(Debug, Parser)]
 pub struct Cmd {
@@ -18,23 +19,24 @@ impl Cmd {
         let root = Root::find()?;
 
         let mut matcher = Matcher::new(Config::DEFAULT);
+        let pattern = Pattern::new(
+            &self.query,
+            CaseMatching::Smart,
+            Normalization::Smart,
+            AtomKind::Fuzzy,
+        );
 
-        Repositories::try_collect(&root)?
+        let matches = pattern.match_list(
+            Repositories::try_collect(&root)?
+                .into_iter()
+                .map(|(path, _)| path.to_string()),
+            &mut matcher,
+        );
+
+        matches
             .into_iter()
-            .map(|(path, _)| path.to_string())
-            .filter_map(|path| {
-                let mut haystack_buf = Vec::new();
-                let mut needle_buf = Vec::new();
-
-                matcher
-                    .fuzzy_match(
-                        Utf32Str::new(&path, &mut haystack_buf),
-                        Utf32Str::new(&self.query, &mut needle_buf),
-                    )
-                    .map(|score| (path, score))
-            })
             .filter(|(_, score)| *score > MIN_SCORE)
-            .sorted_by_key(|(_, score)| -i32::from(*score))
+            .sorted_by_key(|(_, score)| -i64::from(*score))
             .for_each(|(path, _)| println!("{}", path));
 
         Ok(())
