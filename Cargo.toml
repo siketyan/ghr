@@ -1,7 +1,7 @@
 [package]
 name = "ghr"
 description = "Yet another repository management with auto-attaching profiles."
-version = "0.4.3"
+version = "0.4.4"
 license = "MIT"
 homepage = "https://github.com/siketyan/ghr"
 repository = "https://github.com/siketyan/ghr.git"
@@ -41,7 +41,7 @@ gh-config = { version = "0.4.0", optional = true }
 octocrab = { version = "0.38.0", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows]
-version = "0.57.0"
+version = "0.58.0"
 features = [
     "Win32_UI_Shell",
     "Win32_Foundation",
