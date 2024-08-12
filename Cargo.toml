@@ -16,7 +16,7 @@ authors = [
 anyhow = "1.0"
 async-hofs = "0.1.1"
 async-trait = "0.1.81"
-build-info = "0.0.37"
+build-info = "0.0.38"
 clap = { version = "4.5", features = ["derive"] }
 console = "0.15.8"
 dialoguer = "0.11.0"
@@ -49,7 +49,7 @@ features = [
 ]
 
 [build-dependencies]
-build-info-build = "0.0.37"
+build-info-build = "0.0.38"
 
 [features]
 default = ["github"]
