@@ -95,7 +95,7 @@ impl Serialize for Configs {
         self.to_toml()
             .iter()
             .map(|(k, v)| map.serialize_entry(k, v))
-            .try_collect()?;
+            .try_collect::<_, (), _>()?;
 
         map.end()
     }
