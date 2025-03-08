@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 use std::future::Future;
-use std::sync::mpsc::{channel, SendError};
+use std::sync::mpsc::{SendError, channel};
 use std::time::Duration;
 
 use console::style;

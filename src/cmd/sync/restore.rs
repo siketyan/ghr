@@ -40,9 +40,11 @@ impl Cmd {
             });
 
             clone::Cmd {
-                repo: vec![origin
-                    .map(|r| r.url.to_string())
-                    .unwrap_or_else(|| format!("{}:{}/{}", host, owner, repo))],
+                repo: vec![
+                    origin
+                        .map(|r| r.url.to_string())
+                        .unwrap_or_else(|| format!("{}:{}/{}", host, owner, repo)),
+                ],
                 origin: origin.map(|r| r.name.to_string()),
                 ..Default::default()
             }

@@ -9,8 +9,8 @@ use itertools::Itertools;
 use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use toml::value::Value;
 use toml::Table;
+use toml::value::Value;
 
 use crate::git::exclude::{File, Node};
 use crate::rule::ProfileRef;

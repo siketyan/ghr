@@ -2,7 +2,7 @@ use std::env::var;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use dirs::home_dir;
 use tracing::debug;
 

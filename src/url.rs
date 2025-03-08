@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use anyhow::{anyhow, Error, Result};
+use anyhow::{Error, Result, anyhow};
 use itertools::FoldWhile;
 use itertools::Itertools;
 use regex::Regex;
