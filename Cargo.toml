@@ -6,8 +6,8 @@ license = "MIT"
 homepage = "https://github.com/siketyan/ghr"
 repository = "https://github.com/siketyan/ghr.git"
 readme = "README.md"
-rust-version = "1.79.0"
-edition = "2021"
+rust-version = "1.85.0"
+edition = "2024"
 authors = [
     "Naoki Ikeguchi <me@s6n.jp>",
 ]
