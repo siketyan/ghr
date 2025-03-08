@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use git2::{BranchType, ErrorCode, Reference, Repository as GitRepository};
 use serde::{Deserialize, Serialize};
 use tracing::warn;

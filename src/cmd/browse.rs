@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use clap::Parser;
 use git2::Repository;
 
@@ -10,17 +10,16 @@ use crate::url::Url;
 fn open_url(url: &url::Url) -> Result<()> {
     use std::ffi::CString;
 
-    use windows::core::{s, PCSTR};
-    use windows::Win32::Foundation::HWND;
     use windows::Win32::UI::Shell::ShellExecuteA;
     use windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD;
+    use windows::core::{PCSTR, s};
 
     // https://github.com/pkg/browser/issues/16
     // https://github.com/cli/browser/commit/28dca726a60e5e7cdf0326436aa1cb4d476c3305
     // https://web.archive.org/web/20150421233040/https://support.microsoft.com/en-us/kb/224816
     unsafe {
         ShellExecuteA(
-            HWND::default(),
+            None,
             s!("open"),
             PCSTR::from_raw(CString::new(url.to_string().as_str())?.as_ptr() as *const u8),
             PCSTR::null(),

@@ -1,6 +1,6 @@
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{Context, Result, anyhow, bail};
 use async_trait::async_trait;
-use gh_config::{is_enterprise, retrieve_token_from_env, retrieve_token_secure, Hosts, GITHUB_COM};
+use gh_config::{GITHUB_COM, Hosts, is_enterprise, retrieve_token_from_env, retrieve_token_secure};
 use octocrab::Octocrab;
 use serde::Deserialize;
 
@@ -54,7 +54,9 @@ impl PlatformInit for GitHub {
 
         let token = match token {
             Some(t) => t,
-            _ => bail!("GitHub access token could not be found. Install the gh CLI and login, or provide an token as GH_TOKEN environment variable."),
+            _ => bail!(
+                "GitHub access token could not be found. Install the gh CLI and login, or provide an token as GH_TOKEN environment variable."
+            ),
         };
 
         let mut builder = Octocrab::builder().personal_token(token);

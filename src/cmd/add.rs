@@ -1,7 +1,7 @@
 use std::fs::{create_dir_all, rename};
 use std::path::PathBuf;
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use clap::Parser;
 use console::style;
 use dialoguer::Confirm;

@@ -2,8 +2,8 @@ use std::io::stderr;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::EnvFilter;
+use tracing_subscriber::filter::LevelFilter;
 
 mod add;
 mod browse;

@@ -46,7 +46,7 @@ impl<'a> Path<'a> {
     }
 }
 
-impl<'a> Display for Path<'a> {
+impl Display for Path<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}:{}/{}", self.host, self.owner, self.repo)
     }

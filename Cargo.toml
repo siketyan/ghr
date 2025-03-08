@@ -6,8 +6,8 @@ license = "MIT"
 homepage = "https://github.com/siketyan/ghr"
 repository = "https://github.com/siketyan/ghr.git"
 readme = "README.md"
-rust-version = "1.79.0"
-edition = "2021"
+rust-version = "1.85.0"
+edition = "2024"
 authors = [
     "Naoki Ikeguchi <me@s6n.jp>",
 ]
@@ -16,12 +16,12 @@ authors = [
 anyhow = "1.0"
 async-hofs = "0.1.1"
 async-trait = "0.1.87"
-build-info = "0.0.39"
+build-info = "0.0.40"
 clap = { version = "4.5", features = ["derive"] }
 console = "0.15.11"
 dialoguer = "0.11.0"
 dirs = "6.0"
-git2 = "0.19.0"
+git2 = "0.20.0"
 itertools = "0.14.0"
 indicatif = "0.17.11"
 nucleo-matcher = "0.3.1"
@@ -29,7 +29,7 @@ regex = "1.11"
 serde = { version = "1.0", features = ["derive"] }
 serde_regex = "1.1"
 serde_with = "3.12"
-tokio = { version = "1.43", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
 tokio-stream = "0.1.17"
 toml = "0.8.20"
 tracing = "0.1.41"
@@ -37,11 +37,11 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 url = "2.5"
 walkdir = "2.5"
 
-gh-config = { version = "0.4.1", optional = true }
+gh-config = { version = "0.5.1", optional = true }
 octocrab = { version = "0.43.0", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows]
-version = "0.58.0"
+version = "0.60.0"
 features = [
     "Win32_UI_Shell",
     "Win32_Foundation",
@@ -49,7 +49,7 @@ features = [
 ]
 
 [build-dependencies]
-build-info-build = "0.0.39"
+build-info-build = "0.0.40"
 
 [features]
 default = ["github"]
