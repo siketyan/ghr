@@ -18,7 +18,7 @@ jobs:
   checks:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: Swatinem/rust-cache@v2
 
@@ -65,7 +65,7 @@ jobs:
             host: ubuntu-24.04-arm
     runs-on: ${{ matrix.host }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
 
@@ -104,7 +104,7 @@ jobs:
     needs:
       - checks
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: Swatinem/rust-cache@v2
 
@@ -144,7 +144,7 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Release to Scoop Bucket
         uses: siketyan/release-to-registry-action@7e2a91ef78e61dccdb2e8b9401ae54ec58fab4fc
