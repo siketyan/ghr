@@ -25,7 +25,7 @@ git2 = "0.20.2"
 itertools = "0.14.0"
 indicatif = "0.18.0"
 nucleo-matcher = "0.3.1"
-regex = "1.11"
+regex = "1.12"
 serde = { version = "1.0", features = ["derive"] }
 serde_regex = "1.1"
 serde_with = "3.15"
