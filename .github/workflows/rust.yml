@@ -87,7 +87,7 @@ jobs:
       - name: Compress artifacts into .tar.gz file
         run: tar -C ./target/${{ matrix.target }}/release -czf ghr-${{ matrix.target }}.tar.gz ${{ matrix.artifact }}
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ghr-${{ matrix.target }}
           path: ghr-${{ matrix.target }}.tar.gz
