@@ -17,6 +17,27 @@ So I have rewritten them as simple, in Rust, the robust and modern language toda
 
 ## 📦 Installation
 
+### macOS, Linux / Using Nix (easy?)
+
+```shell
+nix profile add github:siketyan/ghr
+```
+
+Binary caches are also available:
+
+```nix
+{
+  nix.settings = {
+    extra-substituters = [
+      "https://siketyan.cachix.org"
+    ];
+    trusted-public-keys = [
+      "siketyan.cachix.org-1:WNNtRH3yo7wUpQ0aURUTCq2BpF97m4UsP0h1nKe6pAA="
+    ];
+  };
+}
+```
+
 ### macOS / Using Homebrew (easy)
 
 ```shell
