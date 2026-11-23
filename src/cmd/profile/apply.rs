@@ -18,7 +18,7 @@ impl Cmd {
         let profile = config
             .profiles
             .get(&self.name)
-            .ok_or_else(|| anyhow!("Unknown profile: {}", &self.name))?;
+            .ok_or_else(|| anyhow!("Unknown profile: {}", self.name))?;
 
         let repo = Repository::open_from_env()?;
         profile.apply(&repo)?;

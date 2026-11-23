@@ -77,9 +77,9 @@ impl Cmd {
 
             match r#ref {
                 Some(Ref::Remote(r)) => {
-                    repo.checkout_tree(&repo.revparse_single(&r)?, None)?;
+                    repo.checkout_tree(&repo.revparse_single(&r.name)?, None)?;
 
-                    info!("Successfully checked out a remote ref: {}", &r);
+                    info!("Successfully checked out a remote ref: {}", &r.name);
                 }
                 Some(Ref::Branch(b)) => {
                     config.git.strategy.checkout.checkout_branch(
