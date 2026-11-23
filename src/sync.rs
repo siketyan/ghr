@@ -14,10 +14,16 @@ pub struct BranchRef {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct RemoteRef {
+    pub name: String,
+}
+
+#[derive(Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum Ref {
+    // Internally tagged enums cannot hold a bare string, so the remote ref name is wrapped in a struct.
     #[serde(rename = "remote")]
-    Remote(String),
+    Remote(RemoteRef),
     #[serde(rename = "branch")]
     Branch(BranchRef),
     // tag is not supported ... yet.
@@ -95,7 +101,9 @@ impl Repository {
 
     fn synced_ref(repo: &GitRepository, head: &Reference) -> Result<Ref> {
         if head.is_remote() {
-            return Ok(Ref::Remote(head.name().unwrap().to_string()));
+            return Ok(Ref::Remote(RemoteRef {
+                name: head.name().unwrap().to_string(),
+            }));
         }
 
         if head.is_branch() {
@@ -158,5 +166,55 @@ impl<'a> FromIterator<Path<'a>> for File {
                 })
                 .collect::<Vec<_>>(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn remote_ref_round_trip() {
+        let file = File {
+            version: Version::V1,
+            repositories: vec![Repository {
+                host: "github.com".to_string(),
+                owner: "siketyan".to_string(),
+                repo: "ghr".to_string(),
+                r#ref: Some(Ref::Remote(RemoteRef {
+                    name: "refs/remotes/origin/main".to_string(),
+                })),
+                remotes: vec![],
+            }],
+        };
+
+        let serialized = toml::to_string(&file).unwrap();
+        let deserialized = toml::from_str::<File>(&serialized).unwrap();
+
+        assert!(matches!(
+            &deserialized.repositories[0].r#ref,
+            Some(Ref::Remote(r)) if r.name == "refs/remotes/origin/main",
+        ));
+    }
+
+    #[test]
+    fn deserialize_remote_ref() {
+        let file = toml::from_str::<File>(
+            r#"
+            version = "1"
+
+            [[repositories]]
+            host = "github.com"
+            owner = "siketyan"
+            repo = "ghr"
+            ref = { type = "remote", name = "refs/remotes/origin/main" }
+            "#,
+        )
+        .unwrap();
+
+        assert!(matches!(
+            &file.repositories[0].r#ref,
+            Some(Ref::Remote(r)) if r.name == "refs/remotes/origin/main",
+        ));
     }
 }
