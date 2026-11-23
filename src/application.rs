@@ -100,3 +100,59 @@ impl Deref for Applications {
         &self.map
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn deserialize_applications() {
+        let applications = toml::from_str::<Applications>(
+            r#"
+            [vscode]
+            cmd = "code"
+            args = ["--new-window", "%p"]
+            "#,
+        )
+        .unwrap();
+
+        let vscode = applications.get("vscode").unwrap();
+        assert_eq!("code", vscode.cmd);
+        assert_eq!(vec!["--new-window", "%p"], vscode.args);
+        assert!(applications.get("unknown").is_none());
+    }
+
+    #[test]
+    fn intermediate_application() {
+        let app = Application::intermediate("code");
+
+        assert_eq!("code", app.cmd);
+        assert_eq!(vec!["%p"], app.args);
+    }
+
+    #[test]
+    fn open_unknown_application_returns_none() {
+        assert!(Applications::default().open("unknown", ".").is_none());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn open_spawns_command() {
+        let app = Application {
+            cmd: "true".to_string(),
+            args: vec!["%p".to_string()],
+        };
+
+        app.open(".").unwrap();
+    }
+
+    #[test]
+    fn open_missing_command_fails() {
+        let app = Application {
+            cmd: "ghr-this-command-does-not-exist".to_string(),
+            args: vec![],
+        };
+
+        assert!(app.open(".").is_err());
+    }
+}

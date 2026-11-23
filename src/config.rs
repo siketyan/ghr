@@ -72,4 +72,68 @@ mod tests {
     fn load_example_config() {
         Config::load_from_str(include_str!("../ghr.example.toml")).unwrap();
     }
+
+    use crate::root::Root;
+    use crate::url::Url;
+
+    #[test]
+    fn load_example_config_values() {
+        let config = Config::load_from_str(include_str!("../ghr.example.toml")).unwrap();
+
+        assert_eq!(Some("siketyan"), config.defaults.owner.as_deref());
+        assert!(config.profiles.contains_key("work"));
+        assert!(config.applications.contains_key("vscode"));
+
+        // Custom patterns come before the defaults, and the defaults are still available.
+        let url = Url::from_str(
+            "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git",
+            &config.patterns,
+            None,
+        )
+        .unwrap();
+        assert_eq!("torvalds", url.owner);
+        assert_eq!("linux", url.repo);
+
+        let url = Url::from_str("siketyan/ghr", &config.patterns, None).unwrap();
+        assert_eq!("siketyan", url.owner);
+        assert_eq!("ghr", url.repo);
+    }
+
+    #[test]
+    fn load_empty_config() {
+        let config = Config::load_from_str("").unwrap();
+
+        assert!(config.defaults.owner.is_none());
+        assert!(config.profiles.is_empty());
+        assert!(config.applications.is_empty());
+        assert!(Url::from_str("siketyan/ghr", &config.patterns, None).is_ok());
+    }
+
+    #[test]
+    fn load_invalid_config() {
+        assert!(Config::load_from_str("defaults = 1").is_err());
+    }
+
+    #[test]
+    fn load_from_root_without_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let config = Config::load_from(&Root::from_path(dir.path())).unwrap();
+
+        assert!(config.defaults.owner.is_none());
+        assert!(Url::from_str("siketyan/ghr", &config.patterns, None).is_ok());
+    }
+
+    #[test]
+    fn load_from_root_with_file() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join("ghr.toml"),
+            "[defaults]\nowner = \"siketyan\"\n",
+        )
+        .unwrap();
+
+        let config = Config::load_from(&Root::from_path(dir.path())).unwrap();
+
+        assert_eq!(Some("siketyan"), config.defaults.owner.as_deref());
+    }
 }

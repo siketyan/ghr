@@ -84,3 +84,52 @@ impl Config {
         self.map.values().find(|c| c.host() == url.host.to_string())
     }
 }
+
+#[cfg(all(test, feature = "github"))]
+mod tests {
+    use super::*;
+    use crate::url::Patterns;
+
+    fn url(s: &str) -> Url {
+        Url::from_str(s, &Patterns::default(), None).unwrap()
+    }
+
+    #[test]
+    fn default_config_finds_github() {
+        let config = Config::default();
+
+        assert!(matches!(
+            config.find(&url("siketyan/ghr")),
+            Some(PlatformConfig::GitHub(_)),
+        ));
+        assert!(config.find(&url("example.com/siketyan/ghr")).is_none());
+    }
+
+    #[test]
+    fn find_enterprise_host() {
+        let config = toml::from_str::<Config>(
+            r#"
+            [github]
+            type = "github"
+
+            [ghe]
+            type = "github"
+            host = "ghe.example.com"
+            "#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            "github.com",
+            config.find(&url("siketyan/ghr")).unwrap().host(),
+        );
+        assert_eq!(
+            "ghe.example.com",
+            config
+                .find(&url("ghe.example.com/siketyan/ghr"))
+                .unwrap()
+                .host(),
+        );
+        assert!(config.find(&url("example.com/siketyan/ghr")).is_none());
+    }
+}

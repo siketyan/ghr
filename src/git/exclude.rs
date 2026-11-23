@@ -198,4 +198,45 @@ mod tests {
             String::from_utf8(content).unwrap(),
         )
     }
+
+    #[test]
+    fn test_add_or_noop() {
+        let mut file = File::default();
+
+        file.add_or_noop(Node::Exclude(".idea".to_string()));
+        file.add_or_noop(Node::Exclude(".idea".to_string()));
+        file.add_or_noop(Node::Exclude(".vscode".to_string()));
+
+        assert_eq!(
+            vec![
+                Node::Exclude(".idea".to_string()),
+                Node::Exclude(".vscode".to_string()),
+            ],
+            file.nodes,
+        );
+    }
+
+    #[test]
+    fn test_file_save_and_load() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".git").join("info")).unwrap();
+
+        let mut file = File::default();
+        file.push(Node::Comment(" managed by ghr".to_string()));
+        file.push(Node::Exclude(".idea".to_string()));
+        file.save(dir.path()).unwrap();
+
+        assert_eq!(
+            "# managed by ghr\n.idea\n",
+            std::fs::read_to_string(dir.path().join(".git/info/exclude")).unwrap(),
+        );
+        assert_eq!(file.nodes, File::load(dir.path()).unwrap().nodes);
+    }
+
+    #[test]
+    fn test_file_load_missing() {
+        let dir = tempfile::tempdir().unwrap();
+
+        assert!(File::load(dir.path()).is_err());
+    }
 }

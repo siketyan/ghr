@@ -97,3 +97,99 @@ impl<'a> From<PartialPath<'a>> for PathBuf {
         (&p).into()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::url::{Host, Patterns};
+
+    fn root() -> Root {
+        Root::from_path("/ghr")
+    }
+
+    #[test]
+    fn to_string_with_all_combinations() {
+        let root = root();
+        let path = Path::new(&root, "github.com", "siketyan", "ghr");
+
+        assert_eq!("github.com:siketyan/ghr", path.to_string_with(true, true));
+        assert_eq!("siketyan/ghr", path.to_string_with(false, true));
+        assert_eq!("github.com:ghr", path.to_string_with(true, false));
+        assert_eq!("ghr", path.to_string_with(false, false));
+    }
+
+    #[test]
+    fn display() {
+        let root = root();
+        let path = Path::new(&root, "example.com", "owner", "repo");
+
+        assert_eq!("example.com:owner/repo", path.to_string());
+    }
+
+    #[test]
+    fn resolve_from_url() {
+        let root = root();
+        let url = Url::from_str("siketyan/ghr", &Patterns::default(), None).unwrap();
+        let path = Path::resolve(&root, &url);
+
+        assert_eq!(Host::GitHub.to_string(), path.host);
+        assert_eq!("siketyan", path.owner);
+        assert_eq!("ghr", path.repo);
+    }
+
+    #[test]
+    fn into_path_buf() {
+        let root = root();
+        let path = Path::new(&root, "github.com", "siketyan", "ghr");
+
+        assert_eq!(
+            PathBuf::from("/ghr/github.com/siketyan/ghr"),
+            PathBuf::from(&path),
+        );
+        assert_eq!(
+            PathBuf::from("/ghr/github.com/siketyan/ghr"),
+            PathBuf::from(path),
+        );
+    }
+
+    #[test]
+    fn partial_path_into_path_buf() {
+        let root = root();
+        let partial = |host: Option<&str>, owner: Option<&str>, repo: Option<&str>| PartialPath {
+            root: &root,
+            host: host.map(String::from),
+            owner: owner.map(String::from),
+            repo: repo.map(String::from),
+        };
+
+        assert_eq!(
+            PathBuf::from("/ghr"),
+            PathBuf::from(partial(None, None, None))
+        );
+        assert_eq!(
+            PathBuf::from("/ghr/github.com"),
+            PathBuf::from(partial(Some("github.com"), None, None)),
+        );
+        assert_eq!(
+            PathBuf::from("/ghr/github.com/siketyan"),
+            PathBuf::from(partial(Some("github.com"), Some("siketyan"), None)),
+        );
+        assert_eq!(
+            PathBuf::from("/ghr/github.com/siketyan/ghr"),
+            PathBuf::from(&partial(Some("github.com"), Some("siketyan"), Some("ghr"))),
+        );
+    }
+
+    #[test]
+    fn partial_path_stops_at_first_missing_segment() {
+        let root = root();
+        let partial = PartialPath {
+            root: &root,
+            host: None,
+            owner: Some("siketyan".to_string()),
+            repo: Some("ghr".to_string()),
+        };
+
+        assert_eq!(PathBuf::from("/ghr"), PathBuf::from(partial));
+    }
+}
