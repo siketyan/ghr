@@ -86,14 +86,14 @@ impl Cmd {
                 let repo = Repository::open_from_env()?;
 
                 let remotes = repo.remotes()?;
-                let remote = match remotes.iter().flatten().next() {
+                let remote = match remotes.iter().find_map(|r| r.ok().flatten()) {
                     Some(r) => r.to_owned(),
                     _ => bail!("The repository has no remote."),
                 };
 
                 let remote = repo.find_remote(&remote)?;
                 match remote.url() {
-                    Some(url) => url.to_string(),
+                    Ok(url) => url.to_string(),
                     _ => bail!("Could not find the remote URL from the repository."),
                 }
             }
