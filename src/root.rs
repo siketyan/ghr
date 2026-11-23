@@ -37,4 +37,9 @@ impl Root {
     pub fn path(&self) -> &PathBuf {
         &self.path
     }
+
+    #[cfg(test)]
+    pub fn from_path(path: impl Into<PathBuf>) -> Self {
+        Self { path: path.into() }
+    }
 }

@@ -613,4 +613,151 @@ mod tests {
             .as_str(),
         )
     }
+
+    #[test]
+    fn parse_with_default_owner() {
+        assert_eq!(
+            Url {
+                owner: "siketyan".to_string(),
+                repo: "ghr".to_string(),
+                ..Default::default()
+            },
+            Url::from_str("ghr", &Patterns::default(), Some("siketyan")).unwrap(),
+        );
+    }
+
+    #[test]
+    fn parse_repo_only_without_default_owner_fails() {
+        assert!(Url::from_str("ghr", &Patterns::default(), None).is_err());
+    }
+
+    #[test]
+    fn parse_strips_git_extension() {
+        let url = Url::from_str("siketyan/ghr.git", &Patterns::default(), None).unwrap();
+
+        assert_eq!("siketyan", url.owner);
+        assert_eq!("ghr", url.repo);
+    }
+
+    #[test]
+    fn parse_from_url_with_user() {
+        let url = Url::from_str(
+            "https://user@example.com/siketyan/ghr.git",
+            &Patterns::default(),
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(Some("user".to_string()), url.user);
+        assert_eq!(Host::Unknown("example.com".to_string()), url.host);
+        assert_eq!("siketyan", url.owner);
+        assert_eq!("ghr", url.repo);
+        assert_eq!(
+            Some("https://user@example.com/siketyan/ghr.git".to_string()),
+            url.raw,
+        );
+    }
+
+    #[test]
+    fn parse_from_ssh_scheme_url_does_not_keep_raw() {
+        let url = Url::from_str(
+            "ssh://git@github.com/siketyan/ghr.git",
+            &Patterns::default(),
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(Scheme::Ssh, url.scheme);
+        assert_eq!(Host::GitHub, url.host);
+        assert_eq!(None, url.raw);
+        assert_eq!("git@github.com:siketyan/ghr.git", url.to_string());
+    }
+
+    #[test]
+    fn parse_from_url_with_unsupported_scheme_fails() {
+        assert!(
+            Url::from_str("ftp://github.com/siketyan/ghr", &Patterns::default(), None).is_err()
+        );
+    }
+
+    #[test]
+    fn parse_from_url_without_repo_fails() {
+        assert!(Url::from_str("https://github.com/siketyan", &Patterns::default(), None).is_err());
+    }
+
+    #[test]
+    fn parse_from_custom_pattern_with_url_template() {
+        let patterns = Patterns::new().with(Pattern {
+            host: Some(Host::Unknown("git.example.com".to_string())),
+            url: Some("https://{{host}}/scm/{{owner}}/{{repo}}.git".to_string()),
+            ..Pattern::from(Regex::new(r"^ex:(?P<owner>[a-z]+)/(?P<repo>[a-z]+)$").unwrap())
+        });
+
+        let url = Url::from_str("ex:team/app", &patterns, None).unwrap();
+
+        assert_eq!(Host::Unknown("git.example.com".to_string()), url.host);
+        assert_eq!("team", url.owner);
+        assert_eq!("app", url.repo);
+        assert_eq!("https://git.example.com/scm/team/app.git", url.to_string(),);
+    }
+
+    #[test]
+    fn parse_no_match() {
+        assert!(Url::from_str("not a url", &Patterns::default(), None).is_err());
+    }
+
+    #[test]
+    fn vcs_from_str() {
+        assert_eq!(Vcs::Git, Vcs::from_str("git").unwrap());
+        assert_eq!(Vcs::Git, Vcs::from_str("GIT").unwrap());
+        assert!(Vcs::from_str("svn").is_err());
+        assert_eq!("git", Vcs::Git.to_string());
+    }
+
+    #[test]
+    fn scheme_from_str() {
+        assert_eq!(Scheme::Https, Scheme::from_str("https").unwrap());
+        assert_eq!(Scheme::Ssh, Scheme::from_str("SSH").unwrap());
+        assert!(Scheme::from_str("http").is_err());
+        assert_eq!("https", Scheme::Https.to_string());
+        assert_eq!("ssh", Scheme::Ssh.to_string());
+    }
+
+    #[test]
+    fn host_from_str() {
+        assert_eq!(Host::GitHub, Host::from_str("github.com").unwrap());
+        assert_eq!(Host::GitHub, Host::from_str("GitHub.com").unwrap());
+        assert_eq!(
+            Host::Unknown("example.com".to_string()),
+            Host::from_str("example.com").unwrap(),
+        );
+        assert_eq!("github.com", Host::GitHub.to_string());
+        assert_eq!(
+            "example.com",
+            Host::Unknown("example.com".to_string()).to_string(),
+        );
+    }
+
+    #[test]
+    fn remove_extensions() {
+        assert_eq!("ghr", Url::remove_extensions("ghr.git"));
+        assert_eq!("ghr", Url::remove_extensions("ghr"));
+        assert_eq!("ghr.rs", Url::remove_extensions("ghr.rs"));
+    }
+
+    #[test]
+    fn to_string_ssh_with_user() {
+        assert_eq!(
+            "git@example.com:siketyan/ghr.git",
+            Url {
+                scheme: Scheme::Ssh,
+                user: Some("git".to_string()),
+                host: Host::Unknown("example.com".to_string()),
+                owner: "siketyan".to_string(),
+                repo: "ghr".to_string(),
+                ..Default::default()
+            }
+            .to_string(),
+        );
+    }
 }

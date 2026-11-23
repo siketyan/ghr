@@ -196,4 +196,115 @@ mod tests {
             configs.get("user.signingkey").unwrap().as_str(),
         );
     }
+
+    #[test]
+    fn load_git_configs_from_nested_tables() {
+        let toml = r#"
+        [user]
+        name = "User Taro"
+
+        [commit]
+        gpgsign = "true"
+        "#;
+
+        let profile = toml::from_str::<Profile>(toml).unwrap();
+        let configs = &profile.configs;
+
+        assert_eq!(2, configs.len());
+        assert_eq!("User Taro", configs.get("user.name").unwrap().as_str());
+        assert_eq!("true", configs.get("commit.gpgsign").unwrap().as_str());
+    }
+
+    #[test]
+    fn load_excludes() {
+        let toml = r#"
+        excludes = ["/.idea/", ".DS_Store"]
+        user.name = "User Taro"
+        "#;
+
+        let profile = toml::from_str::<Profile>(toml).unwrap();
+
+        assert_eq!(vec!["/.idea/", ".DS_Store"], profile.excludes);
+        assert_eq!(1, profile.configs.len());
+        assert!(!profile.configs.contains_key("excludes"));
+    }
+
+    #[test]
+    fn serialize_configs_round_trip() {
+        let toml = r#"
+        user.name = "User Taro"
+        user.email = "taro@example.com"
+        core.editor = "vim"
+        "#;
+
+        let profile = toml::from_str::<Profile>(toml).unwrap();
+        let serialized = toml::to_string(&profile).unwrap();
+        let deserialized = toml::from_str::<Profile>(&serialized).unwrap();
+
+        assert_eq!(*profile.configs, *deserialized.configs);
+    }
+
+    #[test]
+    fn resolve_profile() {
+        let profiles = toml::from_str::<Profiles>(
+            r#"
+            [work]
+            user.name = "Worker"
+
+            [personal]
+            user.name = "Me"
+            "#,
+        )
+        .unwrap();
+
+        let (name, profile) = profiles
+            .resolve(&ProfileRef {
+                name: "work".to_string(),
+            })
+            .unwrap();
+
+        assert_eq!("work", name);
+        assert_eq!("Worker", profile.configs.get("user.name").unwrap());
+        assert!(
+            profiles
+                .resolve(&ProfileRef {
+                    name: "unknown".to_string(),
+                })
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn apply_profile_to_repository() {
+        let dir = tempfile::tempdir().unwrap();
+        let repo = Repository::init(dir.path()).unwrap();
+        std::fs::create_dir_all(dir.path().join(".git").join("info")).unwrap();
+        std::fs::write(dir.path().join(".git/info/exclude"), "# existing\n.idea\n").unwrap();
+
+        let profile = toml::from_str::<Profile>(
+            r#"
+            excludes = [".idea", ".DS_Store"]
+            user.name = "User Taro"
+            user.email = "taro@example.com"
+            "#,
+        )
+        .unwrap();
+
+        profile.apply(&repo).unwrap();
+        // Applying twice must not duplicate excludes.
+        profile.apply(&repo).unwrap();
+
+        let config = repo
+            .config()
+            .unwrap()
+            .open_level(git2::ConfigLevel::Local)
+            .unwrap();
+        assert_eq!("User Taro", config.get_string("user.name").unwrap());
+        assert_eq!("taro@example.com", config.get_string("user.email").unwrap());
+
+        assert_eq!(
+            "# existing\n.idea\n.DS_Store\n",
+            std::fs::read_to_string(dir.path().join(".git/info/exclude")).unwrap(),
+        );
+    }
 }
