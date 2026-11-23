@@ -166,7 +166,7 @@ impl Cmd {
             let config = Arc::clone(&config);
 
             spinner = spinner
-                .with_spin_while(format!("Cloning from {}...", &url), move || async move {
+                .with_spin_while(format!("Cloning from {}...", url), move || async move {
                     this.as_ref().clone(&root, &config, url).await
                 });
         }

@@ -403,7 +403,7 @@ impl Display for Url {
         }
 
         let authority = match &self.user {
-            Some(u) => format!("{}@{}", u, &self.host),
+            Some(u) => format!("{}@{}", u, self.host),
             _ => self.host.to_string(),
         };
 
