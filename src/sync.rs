@@ -79,14 +79,14 @@ impl Repository {
             r#ref,
             remotes: remotes
                 .iter()
-                .flatten()
+                .filter_map(|name| name.ok().flatten())
                 .map(|name| {
                     let remote = repo.find_remote(name)?;
 
                     Ok(Remote {
                         name: name.to_string(),
                         url: remote.url().unwrap_or_default().to_string(),
-                        push_url: remote.pushurl().map(|u| u.to_string()),
+                        push_url: remote.pushurl().ok().flatten().map(|u| u.to_string()),
                     })
                 })
                 .collect::<Result<Vec<_>>>()?,
