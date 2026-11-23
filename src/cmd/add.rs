@@ -41,12 +41,12 @@ impl Cmd {
         let remotes: Vec<Remote> = repo
             .remotes()?
             .iter()
-            .flatten()
+            .filter_map(|r| r.ok().flatten())
             .map(|r| repo.find_remote(r))
             .try_collect()?;
 
         let url =
-            match remotes.iter().filter_map(|r| r.url()).find_map(|u| {
+            match remotes.iter().filter_map(|r| r.url().ok()).find_map(|u| {
                 Url::from_str(u, &config.patterns, config.defaults.owner.as_deref()).ok()
             }) {
                 Some(u) => u,
